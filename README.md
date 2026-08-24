@@ -1,6 +1,6 @@
 ![Duoc UC](https://www.duoc.cl/wp-content/uploads/2022/09/logo-0.png)
 
-# 🧠 Evaluación – Desarrollo Orientado a Objetos II
+# 🧠 Evaluación – Programación Orientado a Objetos II
 
 ## 👨‍💻 Autor del proyecto
 
@@ -14,7 +14,7 @@
 
 # 📖 Introducción
 
-Este repositorio contiene el desarrollo del proyecto **SpeedFast**, realizado para la asignatura **Desarrollo Orientado a Objetos II**.
+Este repositorio contiene el desarrollo del proyecto **SpeedFast**, realizado para la asignatura **Programación Orientado a Objetos II**.
 
 Durante la **Semana 2**, el proyecto evoluciona incorporando clases y métodos abstractos para representar distintos tipos de pedidos y calcular sus tiempos estimados de entrega.
 
