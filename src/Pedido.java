@@ -1,27 +1,26 @@
 /**
- * Clase base que representa un pedido dentro del sistema SpeedFast.
- * Contiene los datos generales de un pedido y los metodos utilizados
- * para la asignacion de repartidores.
+ * Clase abstracta que representa un pedido dentro del sistema SpeedFast.
+ * Contiene los datos generales que comparten todos los tipos de pedidos.
  *
  * @author Sergio Sandoval
  */
-public class Pedido {
+public abstract class Pedido {
 
     private int idPedido;
     private String direccionEntrega;
-    private String tipoPedido;
+    private double distanciaKm;
 
     /**
      * Constructor de la clase Pedido.
      *
      * @param idPedido identificador unico del pedido
      * @param direccionEntrega direccion donde se entregara el pedido
-     * @param tipoPedido tipo de pedido solicitado
+     * @param distanciaKm distancia en kilometros para realizar la entrega
      */
-    public Pedido(int idPedido, String direccionEntrega, String tipoPedido) {
+    public Pedido(int idPedido, String direccionEntrega, double distanciaKm) {
         this.idPedido = idPedido;
         this.direccionEntrega = direccionEntrega;
-        this.tipoPedido = tipoPedido;
+        this.distanciaKm = distanciaKm;
     }
 
     public int getIdPedido() {
@@ -40,27 +39,29 @@ public class Pedido {
         this.direccionEntrega = direccionEntrega;
     }
 
-    public String getTipoPedido() {
-        return tipoPedido;
+    public double getDistanciaKm() {
+        return distanciaKm;
     }
 
-    public void setTipoPedido(String tipoPedido) {
-        this.tipoPedido = tipoPedido;
-    }
-
-    /**
-     * Realiza una asignacion generica de repartidor.
-     */
-    public void asignarRepartidor() {
-        System.out.println("Asignando repartidor...");
+    public void setDistanciaKm(double distanciaKm) {
+        this.distanciaKm = distanciaKm;
     }
 
     /**
-     * Asigna un repartidor indicando su nombre.
+     * Muestra los datos generales del pedido
      *
-     * @param nombreRepartidor nombre del repartidor asignado
+     * junto con el nombre real de la clase del objeto.
      */
-    public void asignarRepartidor(String nombreRepartidor) {
-        System.out.println("Repartidor asignado: " + nombreRepartidor);
+    public void mostrarResumen() {
+        System.out.println(getClass().getSimpleName() + " #" + idPedido);
+        System.out.println("Direccion: " + direccionEntrega);
+        System.out.println("Distancia: " + distanciaKm + " km");
     }
+
+    /**
+     * Calcula el tiempo estimado de entrega.
+     *
+     * @return tiempo estimado de entrega en minutos
+     */
+    public abstract int calcularTiempoEntrega();
 }

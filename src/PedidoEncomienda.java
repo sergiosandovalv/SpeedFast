@@ -1,7 +1,7 @@
 /**
  * Clase que representa un pedido de encomienda dentro del sistema SpeedFast.
  * Hereda los atributos y comportamientos generales de la clase Pedido.
- * La asignacion de repartidor considera la validacion del peso y embalaje.
+ * Calcula el tiempo estimado segun la distancia de entrega.
  *
  * @author Sergio Sandoval
  */
@@ -12,33 +12,20 @@ public class PedidoEncomienda extends Pedido {
      *
      * @param idPedido identificador unico del pedido
      * @param direccionEntrega direccion donde se entregara el pedido
-     * @param tipoPedido tipo de pedido solicitado
+     * @param distanciaKm distancia en kilometros para realizar la entrega
      */
-    public PedidoEncomienda(int idPedido, String direccionEntrega, String tipoPedido) {
-        super(idPedido, direccionEntrega, tipoPedido);
+    public PedidoEncomienda(int idPedido, String direccionEntrega, double distanciaKm) {
+        super(idPedido, direccionEntrega, distanciaKm);
     }
 
     /**
-     * Sobrescribe el metodo general para validar la asignacion
-     * de un repartidor segun el peso y embalaje.
-     */
-    @Override
-    public void asignarRepartidor() {
-        System.out.println("[Pedido Encomienda]");
-        System.out.println("Asignando repartidor...");
-        System.out.println("Verificando peso y embalaje... OK");
-    }
-
-    /**
-     * Sobrescribe la version que recibe el nombre del repartidor.
+     * Calcula el tiempo estimado para un pedido de encomienda.
+     * Se consideran 20 minutos base mas 1.5 minutos por kilometro.
      *
-     * @param nombreRepartidor nombre del repartidor asignado
+     * @return tiempo estimado de entrega en minutos
      */
     @Override
-    public void asignarRepartidor(String nombreRepartidor) {
-        System.out.println("[Pedido Encomienda]");
-        System.out.println("Asignando repartidor...");
-        System.out.println("Verificando peso y embalaje... OK");
-        System.out.println("Pedido asignado a " + nombreRepartidor);
+    public int calcularTiempoEntrega() {
+        return (int) Math.round(20 + (1.5 * getDistanciaKm()));
     }
 }

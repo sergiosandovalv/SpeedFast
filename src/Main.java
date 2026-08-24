@@ -1,61 +1,46 @@
 /**
  * Clase principal del sistema SpeedFast.
- * Permite probar el funcionamiento de los distintos tipos de pedidos,
- * aplicando polimorfismo, sobrescritura y sobrecarga de metodos.
+ * Permite probar los distintos tipos de pedidos y
+ * calcular sus tiempos estimados de entrega.
  *
  * @author Sergio Sandoval
  */
-
 public class Main {
-
-    /**
-     * Metodo principal que inicia la ejecucion del programa.
-     *
-     * @param args argumentos recibidos por linea de comandos
-     */
 
     public static void main(String[] args) {
 
         Pedido pedido1 = new PedidoComida(
                 1,
-                "Av. Providencia 1234",
-                "Comida"
+                "Av. Italia 456",
+                4.5
         );
 
         Pedido pedido2 = new PedidoEncomienda(
                 2,
-                "Av. Apoquindo 4567",
-                "Encomienda"
+                "Av. Independencia 123",
+                6.0
         );
 
         Pedido pedido3 = new PedidoExpress(
                 3,
-                "Av. Las Condes 7890",
-                "Express"
+                "Av. Apoquindo 1500",
+                7.0
         );
-        pedido1.asignarRepartidor();
+
+        pedido1.mostrarResumen();
+        System.out.println("Tiempo estimado de entrega: "
+                + pedido1.calcularTiempoEntrega() + " minutos");
 
         System.out.println();
 
-        pedido2.asignarRepartidor();
+        pedido2.mostrarResumen();
+        System.out.println("Tiempo estimado de entrega: "
+                + pedido2.calcularTiempoEntrega() + " minutos");
 
         System.out.println();
 
-        pedido3.asignarRepartidor();
-
-        System.out.println();
-
-        pedido1.asignarRepartidor("Daniel Leiva");
-
-        System.out.println();
-
-        pedido2.asignarRepartidor("Nicole Salinas");
-
-        System.out.println();
-
-        pedido3.asignarRepartidor("Jaime Acuña");
-
+        pedido3.mostrarResumen();
+        System.out.println("Tiempo estimado de entrega: "
+                + pedido3.calcularTiempoEntrega() + " minutos");
     }
-
-
 }

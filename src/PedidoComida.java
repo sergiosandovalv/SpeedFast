@@ -1,7 +1,6 @@
 /**
- * Clase que representa un pedido de comida dentro del sistema SpeedFast.
- * Hereda los atributos y comportamientos generales de la clase Pedido.
- * La asignacion de repartidor considera la disponibilidad de mochila termica.
+ * Representa un pedido de comida dentro del sistema SpeedFast.
+ * Calcula el tiempo estimado segun la distancia de entrega.
  *
  * @author Sergio Sandoval
  */
@@ -12,33 +11,20 @@ public class PedidoComida extends Pedido {
      *
      * @param idPedido identificador unico del pedido
      * @param direccionEntrega direccion donde se entregara el pedido
-     * @param tipoPedido tipo de pedido solicitado
+     * @param distanciaKm distancia en kilometros para realizar la entrega
      */
-    public PedidoComida(int idPedido, String direccionEntrega, String tipoPedido) {
-        super(idPedido, direccionEntrega, tipoPedido);
+    public PedidoComida(int idPedido, String direccionEntrega, double distanciaKm) {
+        super(idPedido, direccionEntrega, distanciaKm);
     }
 
     /**
-     * Sobrescribe el metodo general para validar la asignacion
-     * de un repartidor con mochila termica.
-     */
-    @Override
-    public void asignarRepartidor() {
-        System.out.println("[Pedido Comida]");
-        System.out.println("Asignando repartidor...");
-        System.out.println("Verificando mochila termica... OK");
-    }
-
-    /**
-     * Sobrescribe la version que recibe el nombre del repartidor.
+     * Calcula el tiempo estimado para un pedido de comida.
+     * Se consideran 15 minutos base mas 2 minutos por kilometro.
      *
-     * @param nombreRepartidor nombre del repartidor asignado
+     * @return tiempo estimado de entrega en minutos.
      */
     @Override
-    public void asignarRepartidor(String nombreRepartidor) {
-        System.out.println("[Pedido Comida]");
-        System.out.println("Asignando repartidor...");
-        System.out.println("Verificando mochila termica... OK");
-        System.out.println("Pedido asignado a " + nombreRepartidor);
-    }
+    public int calcularTiempoEntrega() {
+        return (int) Math.round(15 + (2 * getDistanciaKm()));
+   }
 }
