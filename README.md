@@ -104,7 +104,7 @@ Las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedi
 
 # 📊 Diagrama de clases
 
-El siguiente diagrama representa la relación de herencia entre los diferentes tipos de pedidos y la implementación de las interfaces utilizadas en el sistema.
+El siguiente diagrama representa la relación de herencia entre los diferentes tipos de pedidos y las interfaces implementadas en el sistema.
 
 ```mermaid
 classDiagram
@@ -116,110 +116,84 @@ classDiagram
         -String direccionEntrega
         -double distanciaKm
         -ArrayList~String~ historial
-        +Pedido(int idPedido, String direccionEntrega, double distanciaKm)
-        +int getIdPedido()
-        +void setIdPedido(int idPedido)
-        +String getDireccionEntrega()
-        +void setDireccionEntrega(String direccionEntrega)
-        +double getDistanciaKm()
-        +void setDistanciaKm(double distanciaKm)
-        +ArrayList~String~ getHistorial()
-        #void registrarEvento(String evento)
-        +void mostrarResumen()
-        +void asignarRepartidor()
-        +void asignarRepartidor(String nombreRepartidor)
-        +int calcularTiempoEntrega()*
+        +mostrarResumen()
+        +asignarRepartidor()
+        +asignarRepartidor(String nombreRepartidor)
+        #registrarEvento(String evento)
+        +calcularTiempoEntrega()*
     }
 
     class PedidoComida {
-        +PedidoComida(int idPedido, String direccionEntrega, double distanciaKm)
-        +int calcularTiempoEntrega()
-        +void asignarRepartidor()
-        +void asignarRepartidor(String nombreRepartidor)
-        +void despachar()
-        +void cancelar()
-        +void verHistorial()
+        +calcularTiempoEntrega()
+        +asignarRepartidor()
+        +asignarRepartidor(String nombreRepartidor)
+        +despachar()
+        +cancelar()
+        +verHistorial()
     }
 
     class PedidoEncomienda {
-        +PedidoEncomienda(int idPedido, String direccionEntrega, double distanciaKm)
-        +int calcularTiempoEntrega()
-        +void asignarRepartidor()
-        +void asignarRepartidor(String nombreRepartidor)
-        +void despachar()
-        +void cancelar()
-        +void verHistorial()
+        +calcularTiempoEntrega()
+        +asignarRepartidor()
+        +asignarRepartidor(String nombreRepartidor)
+        +despachar()
+        +cancelar()
+        +verHistorial()
     }
 
     class PedidoExpress {
-        +PedidoExpress(int idPedido, String direccionEntrega, double distanciaKm)
-        +int calcularTiempoEntrega()
-        +void asignarRepartidor()
-        +void asignarRepartidor(String nombreRepartidor)
-        +void despachar()
-        +void cancelar()
-        +void verHistorial()
+        +calcularTiempoEntrega()
+        +asignarRepartidor()
+        +asignarRepartidor(String nombreRepartidor)
+        +despachar()
+        +cancelar()
+        +verHistorial()
     }
 
     class Despachable {
         <<interface>>
-        +void despachar()
+        +despachar()
     }
 
     class Cancelable {
         <<interface>>
-        +void cancelar()
+        +cancelar()
     }
 
     class Rastreable {
         <<interface>>
-        +void verHistorial()
+        +verHistorial()
     }
 
     Pedido <|-- PedidoComida
     Pedido <|-- PedidoEncomienda
     Pedido <|-- PedidoExpress
 
-    Despachable <|.. PedidoComida
-    Despachable <|.. PedidoEncomienda
-    Despachable <|.. PedidoExpress
+    PedidoComida ..|> Despachable
+    PedidoComida ..|> Cancelable
+    PedidoComida ..|> Rastreable
 
-    Cancelable <|.. PedidoComida
-    Cancelable <|.. PedidoEncomienda
-    Cancelable <|.. PedidoExpress
+    PedidoEncomienda ..|> Despachable
+    PedidoEncomienda ..|> Cancelable
+    PedidoEncomienda ..|> Rastreable
 
-    Rastreable <|.. PedidoComida
-    Rastreable <|.. PedidoEncomienda
-    Rastreable <|.. PedidoExpress
-
-    classDef abstracta fill:#fff3cd,stroke:#856404,stroke-width:2px
-    classDef concreta fill:#d1ecf1,stroke:#0c5460,stroke-width:2px
-    classDef interfaz fill:#d4edda,stroke:#155724,stroke-width:2px
-
-    class Pedido abstracta
-
-    class PedidoComida concreta
-    class PedidoEncomienda concreta
-    class PedidoExpress concreta
-
-    class Despachable interfaz
-    class Cancelable interfaz
-    class Rastreable interfaz
+    PedidoExpress ..|> Despachable
+    PedidoExpress ..|> Cancelable
+    PedidoExpress ..|> Rastreable
 ```
 
 ### 📌 Leyenda del diagrama
 
-- 🟨 **Amarillo:** clase abstracta `Pedido`.
-- 🟦 **Azul:** clases concretas `PedidoComida`, `PedidoEncomienda` y `PedidoExpress`.
-- 🟩 **Verde:** interfaces `Despachable`, `Cancelable` y `Rastreable`.
-- **Línea continua con flecha:** representa **herencia (`extends`)**.
-- **Línea discontinua con flecha:** representa **implementación (`implements`)**.
+- **`<<abstract>>`** identifica la clase abstracta `Pedido`.
+- **`<<interface>>`** identifica una interfaz.
+- **Línea continua con triángulo:** representa herencia mediante `extends`.
+- **Línea discontinua con triángulo:** representa implementación mediante `implements`.
 - **`+`** representa un elemento `public`.
 - **`-`** representa un elemento `private`.
 - **`#`** representa un elemento `protected`.
 - **`*`** identifica el método abstracto `calcularTiempoEntrega()`.
 
-Las tres clases concretas heredan de `Pedido` e implementan las interfaces `Despachable`, `Cancelable` y `Rastreable`.
+Las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedido` e implementan las interfaces `Despachable`, `Cancelable` y `Rastreable`.
 
 ---
 
