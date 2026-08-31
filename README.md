@@ -108,6 +108,7 @@ El siguiente diagrama representa la relación de herencia entre los diferentes t
 
 ```mermaid
 classDiagram
+    direction TB
 
     class Pedido {
         <<abstract>>
@@ -115,7 +116,6 @@ classDiagram
         -String direccionEntrega
         -double distanciaKm
         -ArrayList~String~ historial
-
         +Pedido(int idPedido, String direccionEntrega, double distanciaKm)
         +int getIdPedido()
         +void setIdPedido(int idPedido)
@@ -191,16 +191,29 @@ classDiagram
     Rastreable <|.. PedidoComida
     Rastreable <|.. PedidoEncomienda
     Rastreable <|.. PedidoExpress
+
+    classDef abstracta fill:#fff3cd,stroke:#856404,stroke-width:2px
+    classDef concreta fill:#d1ecf1,stroke:#0c5460,stroke-width:2px
+    classDef interfaz fill:#d4edda,stroke:#155724,stroke-width:2px
+
+    class Pedido abstracta
+    class PedidoComida,PedidoEncomienda,PedidoExpress concreta
+    class Despachable,Cancelable,Rastreable interfaz
 ```
 
-En el diagrama:
+### 📌 Leyenda del diagrama
 
-- `Pedido` corresponde a la clase abstracta principal.
-- `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedido`.
-- `Despachable` representa la capacidad de despachar un pedido.
-- `Cancelable` representa la capacidad de cancelar un pedido.
-- `Rastreable` representa la capacidad de consultar su historial.
-- Las tres clases concretas implementan las tres interfaces.
+- 🟨 **Amarillo:** clase abstracta `Pedido`.
+- 🟦 **Azul:** clases concretas `PedidoComida`, `PedidoEncomienda` y `PedidoExpress`.
+- 🟩 **Verde:** interfaces `Despachable`, `Cancelable` y `Rastreable`.
+- **Línea continua con flecha:** representa **herencia (`extends`)**.
+- **Línea discontinua con flecha:** representa **implementación (`implements`)**.
+- **`+`** representa un elemento `public`.
+- **`-`** representa un elemento `private`.
+- **`#`** representa un elemento `protected`.
+- **`*`** identifica el método abstracto `calcularTiempoEntrega()`.
+
+Las tres clases concretas heredan de `Pedido` e implementan las interfaces `Despachable`, `Cancelable` y `Rastreable`.
 
 ---
 
