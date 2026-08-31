@@ -197,8 +197,14 @@ classDiagram
     classDef interfaz fill:#d4edda,stroke:#155724,stroke-width:2px
 
     class Pedido abstracta
-    class PedidoComida,PedidoEncomienda,PedidoExpress concreta
-    class Despachable,Cancelable,Rastreable interfaz
+
+    class PedidoComida concreta
+    class PedidoEncomienda concreta
+    class PedidoExpress concreta
+
+    class Despachable interfaz
+    class Cancelable interfaz
+    class Rastreable interfaz
 ```
 
 ### 📌 Leyenda del diagrama
