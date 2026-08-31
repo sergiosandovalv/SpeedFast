@@ -78,122 +78,43 @@ SpeedFast/
 
 ---
 
-# 🏗️ Estructura de herencia
-
-```text
-                         Pedido
-                       (abstracta)
-                            │
-             ┌──────────────┼──────────────┐
-             │              │              │
-       PedidoComida   PedidoEncomienda  PedidoExpress
-```
-
-La clase abstracta `Pedido` contiene los atributos y comportamientos comunes de todos los pedidos:
-
-- `idPedido`
-- `direccionEntrega`
-- `distanciaKm`
-- `historial`
-
-También implementa comportamientos comunes como `mostrarResumen()` y declara el método abstracto `calcularTiempoEntrega()`.
-
-Las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedido` y especializan los comportamientos necesarios según el tipo de pedido.
-
----
-
 # 📊 Diagrama de clases
 
-El siguiente diagrama representa la relación de herencia entre los diferentes tipos de pedidos y las interfaces implementadas en el sistema.
+El siguiente diagrama representa la estructura principal del sistema, mostrando la herencia desde la clase abstracta `Pedido` y las interfaces implementadas por las clases concretas.
 
-```mermaid
-classDiagram
-    direction TB
-
-    class Pedido {
-        <<abstract>>
-        -int idPedido
-        -String direccionEntrega
-        -double distanciaKm
-        -ArrayList~String~ historial
-        +mostrarResumen()
-        +asignarRepartidor()
-        +asignarRepartidor(String nombreRepartidor)
-        #registrarEvento(String evento)
-        +calcularTiempoEntrega()*
-    }
-
-    class PedidoComida {
-        +calcularTiempoEntrega()
-        +asignarRepartidor()
-        +asignarRepartidor(String nombreRepartidor)
-        +despachar()
-        +cancelar()
-        +verHistorial()
-    }
-
-    class PedidoEncomienda {
-        +calcularTiempoEntrega()
-        +asignarRepartidor()
-        +asignarRepartidor(String nombreRepartidor)
-        +despachar()
-        +cancelar()
-        +verHistorial()
-    }
-
-    class PedidoExpress {
-        +calcularTiempoEntrega()
-        +asignarRepartidor()
-        +asignarRepartidor(String nombreRepartidor)
-        +despachar()
-        +cancelar()
-        +verHistorial()
-    }
-
-    class Despachable {
-        <<interface>>
-        +despachar()
-    }
-
-    class Cancelable {
-        <<interface>>
-        +cancelar()
-    }
-
-    class Rastreable {
-        <<interface>>
-        +verHistorial()
-    }
-
-    Pedido <|-- PedidoComida
-    Pedido <|-- PedidoEncomienda
-    Pedido <|-- PedidoExpress
-
-    PedidoComida ..|> Despachable
-    PedidoComida ..|> Cancelable
-    PedidoComida ..|> Rastreable
-
-    PedidoEncomienda ..|> Despachable
-    PedidoEncomienda ..|> Cancelable
-    PedidoEncomienda ..|> Rastreable
-
-    PedidoExpress ..|> Despachable
-    PedidoExpress ..|> Cancelable
-    PedidoExpress ..|> Rastreable
+```text
+                              Pedido
+                           <<abstracta>>
+                                 │
+                ┌────────────────┼────────────────┐
+                │                │                │
+                ▼                ▼                ▼
+          PedidoComida    PedidoEncomienda   PedidoExpress
+                │                │                │
+                └────────────────┼────────────────┘
+                                 │
+                    implementan las interfaces
+                                 │
+                ┌────────────────┼────────────────┐
+                │                │                │
+                ▼                ▼                ▼
+          Despachable        Cancelable        Rastreable
+         <<interface>>      <<interface>>      <<interface>>
+                │                │                │
+                ▼                ▼                ▼
+          despachar()        cancelar()       verHistorial()
 ```
 
 ### 📌 Leyenda del diagrama
 
-- **`<<abstract>>`** identifica la clase abstracta `Pedido`.
-- **`<<interface>>`** identifica una interfaz.
-- **Línea continua con triángulo:** representa herencia mediante `extends`.
-- **Línea discontinua con triángulo:** representa implementación mediante `implements`.
-- **`+`** representa un elemento `public`.
-- **`-`** representa un elemento `private`.
-- **`#`** representa un elemento `protected`.
-- **`*`** identifica el método abstracto `calcularTiempoEntrega()`.
-
-Las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedido` e implementan las interfaces `Despachable`, `Cancelable` y `Rastreable`.
+- **`Pedido`** es la clase abstracta que contiene los atributos y comportamientos comunes.
+- **`PedidoComida`**, **`PedidoEncomienda`** y **`PedidoExpress`** son clases concretas que heredan de `Pedido`.
+- **`Despachable`**, **`Cancelable`** y **`Rastreable`** son interfaces que representan capacidades del sistema.
+- La relación entre `Pedido` y sus subclases corresponde a **herencia (`extends`)**.
+- Las tres clases concretas implementan las interfaces mediante **`implements`**.
+- `Despachable` define el método `despachar()`.
+- `Cancelable` define el método `cancelar()`.
+- `Rastreable` define el método `verHistorial()`.
 
 ---
 
@@ -354,7 +275,6 @@ es posible visualizar los eventos que realmente fueron realizados sobre cada ped
 - Git.
 - GitHub.
 - Markdown.
-- Mermaid.
 
 ---
 
