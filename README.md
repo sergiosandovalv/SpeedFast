@@ -102,6 +102,108 @@ Las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedi
 
 ---
 
+# 📊 Diagrama de clases
+
+El siguiente diagrama representa la relación de herencia entre los diferentes tipos de pedidos y la implementación de las interfaces utilizadas en el sistema.
+
+```mermaid
+classDiagram
+
+    class Pedido {
+        <<abstract>>
+        -int idPedido
+        -String direccionEntrega
+        -double distanciaKm
+        -ArrayList~String~ historial
+
+        +Pedido(int idPedido, String direccionEntrega, double distanciaKm)
+        +int getIdPedido()
+        +void setIdPedido(int idPedido)
+        +String getDireccionEntrega()
+        +void setDireccionEntrega(String direccionEntrega)
+        +double getDistanciaKm()
+        +void setDistanciaKm(double distanciaKm)
+        +ArrayList~String~ getHistorial()
+        #void registrarEvento(String evento)
+        +void mostrarResumen()
+        +void asignarRepartidor()
+        +void asignarRepartidor(String nombreRepartidor)
+        +int calcularTiempoEntrega()*
+    }
+
+    class PedidoComida {
+        +PedidoComida(int idPedido, String direccionEntrega, double distanciaKm)
+        +int calcularTiempoEntrega()
+        +void asignarRepartidor()
+        +void asignarRepartidor(String nombreRepartidor)
+        +void despachar()
+        +void cancelar()
+        +void verHistorial()
+    }
+
+    class PedidoEncomienda {
+        +PedidoEncomienda(int idPedido, String direccionEntrega, double distanciaKm)
+        +int calcularTiempoEntrega()
+        +void asignarRepartidor()
+        +void asignarRepartidor(String nombreRepartidor)
+        +void despachar()
+        +void cancelar()
+        +void verHistorial()
+    }
+
+    class PedidoExpress {
+        +PedidoExpress(int idPedido, String direccionEntrega, double distanciaKm)
+        +int calcularTiempoEntrega()
+        +void asignarRepartidor()
+        +void asignarRepartidor(String nombreRepartidor)
+        +void despachar()
+        +void cancelar()
+        +void verHistorial()
+    }
+
+    class Despachable {
+        <<interface>>
+        +void despachar()
+    }
+
+    class Cancelable {
+        <<interface>>
+        +void cancelar()
+    }
+
+    class Rastreable {
+        <<interface>>
+        +void verHistorial()
+    }
+
+    Pedido <|-- PedidoComida
+    Pedido <|-- PedidoEncomienda
+    Pedido <|-- PedidoExpress
+
+    Despachable <|.. PedidoComida
+    Despachable <|.. PedidoEncomienda
+    Despachable <|.. PedidoExpress
+
+    Cancelable <|.. PedidoComida
+    Cancelable <|.. PedidoEncomienda
+    Cancelable <|.. PedidoExpress
+
+    Rastreable <|.. PedidoComida
+    Rastreable <|.. PedidoEncomienda
+    Rastreable <|.. PedidoExpress
+```
+
+En el diagrama:
+
+- `Pedido` corresponde a la clase abstracta principal.
+- `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan de `Pedido`.
+- `Despachable` representa la capacidad de despachar un pedido.
+- `Cancelable` representa la capacidad de cancelar un pedido.
+- `Rastreable` representa la capacidad de consultar su historial.
+- Las tres clases concretas implementan las tres interfaces.
+
+---
+
 # 🧩 Abstracción
 
 La clase `Pedido` se define como abstracta:
@@ -197,7 +299,7 @@ Esto permite utilizar una estructura común y mantener comportamientos diferente
 
 # 🔌 Interfaces
 
-Durante la Semana 3 se incorporan tres interfaces:
+Durante la Semana 3 se incorporan tres interfaces.
 
 ### Despachable
 
@@ -259,6 +361,7 @@ es posible visualizar los eventos que realmente fueron realizados sobre cada ped
 - Git.
 - GitHub.
 - Markdown.
+- Mermaid.
 
 ---
 
@@ -374,7 +477,7 @@ Historial del PedidoExpress #3:
 
 La clase abstracta `Pedido` centraliza los atributos y comportamientos comunes, evitando repetir código en las subclases.
 
-Cada subclase contiene únicamente las reglas específicas de su tipo de pedido.
+Cada subclase contiene las reglas específicas correspondientes a su tipo de pedido.
 
 Las interfaces permiten separar capacidades como despacho, cancelación y rastreo de la jerarquía principal, facilitando la incorporación de nuevos tipos de pedidos o comportamientos en el futuro.
 
