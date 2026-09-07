@@ -1,7 +1,14 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Clase principal del sistema SpeedFast.
  * Simula diferentes tipos de pedidos y demuestra
- * herencia, polimorfismo, abstraccion e interfaces.
+ * herencia, polimorfismo, abstraccion, interfaces
+ * y concurrencia.
  *
  * @author Sergio Sandoval
  */
@@ -30,6 +37,24 @@ public class Main {
                 3,
                 "Av. Apoquindo 1500",
                 7.0
+        );
+
+        Pedido pedido4 = new PedidoComida(
+                4,
+                "Av. Providencia 2200",
+                5.2
+        );
+
+        Pedido pedido5 = new PedidoEncomienda(
+                5,
+                "Av. Matta 850",
+                8.0
+        );
+
+        Pedido pedido6 = new PedidoExpress(
+                6,
+                "Av. Las Condes 9000",
+                3.5
         );
 
         System.out.println("========================================");
@@ -102,6 +127,56 @@ public class Main {
 
         System.out.println();
         System.out.println("========================================");
+        System.out.println("        PEDIDOS SIMULTANEOS");
+        System.out.println("========================================");
+        System.out.println();
 
+        List<Pedido> pedidosDaniel = new ArrayList<>();
+        pedidosDaniel.add(pedido1);
+        pedidosDaniel.add(pedido2);
+
+        List<Pedido> pedidosNicole = new ArrayList<>();
+        pedidosNicole.add(pedido3);
+        pedidosNicole.add(pedido4);
+
+        List<Pedido> pedidosJaime = new ArrayList<>();
+        pedidosJaime.add(pedido5);
+        pedidosJaime.add(pedido6);
+
+        Repartidor repartidorDaniel = new Repartidor(
+                "Daniel",
+                pedidosDaniel
+        );
+
+        Repartidor repartidorNicole = new Repartidor(
+                "Nicole",
+                pedidosNicole
+        );
+
+        Repartidor repartidorJaime = new Repartidor(
+                "Jaime",
+                pedidosJaime
+        );
+
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+
+        executor.submit(repartidorDaniel);
+        executor.submit(repartidorNicole);
+        executor.submit(repartidorJaime);
+
+        executor.shutdown();
+
+        try {
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println();
+        System.out.println("Todos los repartidores finalizaron sus entregas.");
+        System.out.println("========================================");
     }
 }
