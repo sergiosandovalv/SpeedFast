@@ -153,8 +153,7 @@ El siguiente diagrama representa la estructura principal del sistema, mostrando 
 - **`PedidoComida`**, **`PedidoEncomienda`** y **`PedidoExpress`** son clases concretas que heredan de `Pedido`.
 - **`Despachable`**, **`Cancelable`** y **`Rastreable`** representan capacidades de los pedidos.
 - **`EstadoPedido`** define los estados `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
-- **`ZonaDeCarga`** contiene la lista compartida de pedidos.
-- `ZonaDeCarga` utiliza métodos `synchronized` para controlar el acceso concurrente.
+- **`ZonaDeCarga`** contiene la lista compartida de pedidos y utiliza métodos `synchronized` para controlar el acceso concurrente.
 - **`Repartidor`** implementa `Runnable` y comparte una referencia a `ZonaDeCarga`.
 - Los repartidores retiran pedidos desde la misma zona de carga.
 
@@ -255,7 +254,7 @@ Esto permite utilizar una estructura común y mantener comportamientos diferente
 
 # 🔌 Interfaces
 
-Durante la Semana 3 se incorporan tres interfaces.
+El sistema incorpora tres interfaces para representar diferentes capacidades de los pedidos.
 
 ### Despachable
 
