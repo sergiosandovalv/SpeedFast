@@ -1,27 +1,24 @@
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * Clase que representa a un repartidor dentro del sistema SpeedFast.
- * Cada repartidor funciona como una tarea concurrente y procesa
- * de forma secuencial los pedidos que tiene asignados.
+ * Cada repartidor funciona como una tarea concurrente y obtiene
+ * pedidos desde una zona de carga compartida.
  *
  * @author Sergio Sandoval
  */
 public class Repartidor implements Runnable {
 
     private String nombre;
-    private List<Pedido> pedidos;
+    private ZonaDeCarga zonaDeCarga;
 
     /**
      * Constructor de la clase Repartidor.
      *
      * @param nombre nombre del repartidor
-     * @param pedidos lista de pedidos asignados
+     * @param zonaDeCarga zona de carga compartida
      */
-    public Repartidor(String nombre, List<Pedido> pedidos) {
+    public Repartidor(String nombre, ZonaDeCarga zonaDeCarga) {
         this.nombre = nombre;
-        this.pedidos = pedidos;
+        this.zonaDeCarga = zonaDeCarga;
     }
 
     /**
@@ -43,60 +40,96 @@ public class Repartidor implements Runnable {
     }
 
     /**
-     * Obtiene la lista de pedidos asignados.
+     * Obtiene la zona de carga utilizada por el repartidor.
      *
-     * @return lista de pedidos
+     * @return zona de carga compartida
      */
-    public List<Pedido> getPedidos() {
-        return pedidos;
+    public ZonaDeCarga getZonaDeCarga() {
+        return zonaDeCarga;
     }
 
     /**
-     * Modifica la lista de pedidos asignados.
+     * Modifica la zona de carga utilizada por el repartidor.
      *
-     * @param pedidos nueva lista de pedidos
+     * @param zonaDeCarga nueva zona de carga
      */
-    public void setPedidos(List<Pedido> pedidos) {
-        this.pedidos = pedidos;
+    public void setZonaDeCarga(ZonaDeCarga zonaDeCarga) {
+        this.zonaDeCarga = zonaDeCarga;
     }
 
     /**
-     * Ejecuta la entrega secuencial de los pedidos asignados.
-     * Cada entrega se simula mediante una pausa aleatoria.
+     * Procesa pedidos obtenidos desde la zona de carga compartida.
+     * Cada pedido cambia su estado a EN_REPARTO, simula el tiempo
+     * de entrega y finalmente cambia su estado a ENTREGADO.
      */
     @Override
     public void run() {
 
-        System.out.println("Repartidor " + nombre + " inicia sus entregas.");
+        System.out.println(
+                "[Repartidor - " + nombre + "] inicia sus entregas."
+        );
 
-        for (Pedido pedido : pedidos) {
+        while (true) {
+
+            Pedido pedido = zonaDeCarga.retirarPedido();
+
+            if (pedido == null) {
+                break;
+            }
+
+            pedido.setEstado(EstadoPedido.EN_REPARTO.name());
 
             System.out.println(
-                    "Repartidor " + nombre
-                            + " procesando pedido #"
+                    "[Repartidor - " + nombre
+                            + "] Retirando pedido #"
+                            + pedido.getIdPedido()
+            );
+
+            System.out.println(
+                    "[Repartidor - " + nombre
+                            + "] Estado: "
+                            + pedido.getEstado()
+            );
+
+            System.out.println(
+                    "[Repartidor - " + nombre
+                            + "] Entregando pedido #"
                             + pedido.getIdPedido()
             );
 
             try {
-                int tiempoEspera = ThreadLocalRandom.current().nextInt(1000, 3001);
-                Thread.sleep(tiempoEspera);
+                Thread.sleep(1000);
 
             } catch (InterruptedException e) {
+
                 System.out.println(
-                        "Repartidor " + nombre + " fue interrumpido."
+                        "[Repartidor - " + nombre
+                                + "] fue interrumpido."
                 );
 
                 Thread.currentThread().interrupt();
                 return;
             }
 
+            pedido.setEstado(EstadoPedido.ENTREGADO.name());
+
             System.out.println(
-                    "Repartidor " + nombre
-                            + " completo el pedido #"
+                    "[Repartidor - " + nombre
+                            + "] Pedido #"
                             + pedido.getIdPedido()
+                            + " entregado."
+            );
+
+            System.out.println(
+                    "[Repartidor - " + nombre
+                            + "] Estado: "
+                            + pedido.getEstado()
             );
         }
 
-        System.out.println("Repartidor " + nombre + " termino sus entregas.");
+        System.out.println(
+                "[Repartidor - " + nombre
+                        + "] termino sus entregas."
+        );
     }
 }
