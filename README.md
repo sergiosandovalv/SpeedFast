@@ -18,9 +18,11 @@
 
 Este repositorio contiene el desarrollo del proyecto **SpeedFast**, realizado para la asignatura **Programación Orientado a Objetos II**.
 
-Durante la **Semana 3**, el proyecto integra los conceptos desarrollados anteriormente de herencia, polimorfismo y abstracción, incorporando además el uso de interfaces para representar diferentes capacidades de los pedidos.
+Durante las primeras tres semanas, el proyecto integra conceptos de herencia, polimorfismo, abstracción e interfaces para representar diferentes tipos de pedidos y sus capacidades.
 
-El sistema permite trabajar con pedidos de comida, encomienda y express, aplicando comportamientos específicos para la asignación de repartidores, cálculo del tiempo de entrega, despacho, cancelación y consulta del historial.
+Durante la **Semana 4**, el proyecto incorpora concurrencia para simular que varios repartidores realizan entregas durante el mismo período de tiempo.
+
+Para ello se incorpora la clase `Repartidor`, que implementa la interfaz `Runnable`, junto con el uso de `Thread.sleep()` para simular tiempos de entrega y `ExecutorService` para administrar la ejecución concurrente de los repartidores.
 
 ---
 
@@ -30,7 +32,9 @@ El propósito del proyecto es aplicar conceptos de Programación Orientada a Obj
 
 El sistema permite representar diferentes tipos de pedidos, reutilizar sus características comunes y definir comportamientos específicos según el tipo de pedido.
 
-Además, mediante las interfaces `Despachable`, `Cancelable` y `Rastreable`, se incorporan diferentes capacidades sin modificar la estructura principal de herencia.
+Mediante las interfaces `Despachable`, `Cancelable` y `Rastreable`, se incorporan diferentes capacidades sin modificar la estructura principal de herencia.
+
+Durante la Semana 4, el sistema también permite simular que varios repartidores procesan sus pedidos concurrentemente mediante tareas `Runnable` administradas por un `ExecutorService`.
 
 ---
 
@@ -53,6 +57,16 @@ Además, mediante las interfaces `Despachable`, `Cancelable` y `Rastreable`, se 
 - Uso de `ArrayList`.
 - Reutilización de código.
 - Documentación mediante Javadoc.
+- Concurrencia.
+- Interfaz `Runnable`.
+- Método `run()`.
+- Uso de `Thread.sleep()`.
+- Manejo de `InterruptedException`.
+- Uso de `ExecutorService`.
+- Uso de `newFixedThreadPool()`.
+- Envío de tareas mediante `submit()`.
+- Cierre mediante `shutdown()`.
+- Espera de finalización mediante `awaitTermination()`.
 - Control de versiones mediante Git.
 - Publicación del proyecto en GitHub.
 
@@ -73,36 +87,46 @@ SpeedFast/
     ├── PedidoComida.java
     ├── PedidoEncomienda.java
     ├── PedidoExpress.java
-    └── Rastreable.java
+    ├── Rastreable.java
+    └── Repartidor.java
 ```
 
 ---
 
 # 📊 Diagrama de clases
 
-El siguiente diagrama representa la estructura principal del sistema, mostrando la herencia desde la clase abstracta `Pedido` y las interfaces implementadas por las clases concretas.
+El siguiente diagrama representa la estructura principal del sistema, mostrando la herencia desde la clase abstracta `Pedido`, las interfaces implementadas por las clases concretas y la incorporación de `Repartidor` como tarea concurrente.
 
 ```text
                               Pedido
                            <<abstracta>>
-                                 │
-                ┌────────────────┼────────────────┐
-                │                │                │
-                ▼                ▼                ▼
-          PedidoComida    PedidoEncomienda   PedidoExpress
-                │                │                │
-                └────────────────┼────────────────┘
-                                 │
+                                │
+                ┌───────────────┼────────────────┐
+                │               │                │
+                ▼               ▼                ▼
+          PedidoComida   PedidoEncomienda   PedidoExpress
+                │               │                │
+                └───────────────┼────────────────┘
+                                │
                     implementan las interfaces
-                                 │
-                ┌────────────────┼────────────────┐
-                │                │                │
-                ▼                ▼                ▼
-          Despachable        Cancelable        Rastreable
-         <<interface>>      <<interface>>      <<interface>>
-                │                │                │
-                ▼                ▼                ▼
-          despachar()        cancelar()       verHistorial()
+                                │
+                ┌───────────────┼────────────────┐
+                │               │                │
+                ▼               ▼                ▼
+          Despachable       Cancelable       Rastreable
+         <<interface>>     <<interface>>     <<interface>>
+                │               │                │
+                ▼               ▼                ▼
+          despachar()       cancelar()      verHistorial()
+
+
+                         Repartidor
+                             │
+                    implements Runnable
+                             │
+                           run()
+                             │
+                     List<Pedido>
 ```
 
 ### 📌 Leyenda del diagrama
@@ -111,10 +135,13 @@ El siguiente diagrama representa la estructura principal del sistema, mostrando 
 - **`PedidoComida`**, **`PedidoEncomienda`** y **`PedidoExpress`** son clases concretas que heredan de `Pedido`.
 - **`Despachable`**, **`Cancelable`** y **`Rastreable`** son interfaces que representan capacidades del sistema.
 - La relación entre `Pedido` y sus subclases corresponde a **herencia (`extends`)**.
-- Las tres clases concretas implementan las interfaces mediante **`implements`**.
+- Las clases concretas implementan las interfaces mediante **`implements`**.
 - `Despachable` define el método `despachar()`.
 - `Cancelable` define el método `cancelar()`.
 - `Rastreable` define el método `verHistorial()`.
+- **`Repartidor`** representa una tarea de entrega.
+- `Repartidor` implementa la interfaz `Runnable`.
+- Cada repartidor contiene una lista de pedidos que procesa secuencialmente mediante `run()`.
 
 ---
 
@@ -268,6 +295,106 @@ es posible visualizar los eventos que realmente fueron realizados sobre cada ped
 
 ---
 
+# 🧵 Concurrencia – Semana 4
+
+Durante la Semana 4 se incorpora la clase `Repartidor` para representar una tarea de entrega.
+
+La clase implementa la interfaz `Runnable`:
+
+```java
+public class Repartidor implements Runnable
+```
+
+Cada repartidor contiene:
+
+- Un nombre.
+- Una lista de pedidos asignados.
+
+El método `run()` recorre secuencialmente los pedidos correspondientes al repartidor.
+
+```java
+@Override
+public void run() {
+    // Procesamiento de pedidos
+}
+```
+
+Esto permite que cada repartidor mantenga el orden de sus propios pedidos mientras varios repartidores pueden avanzar concurrentemente.
+
+---
+
+# ⏳ Simulación de entregas
+
+Para representar el tiempo requerido por cada entrega se utiliza:
+
+```java
+Thread.sleep(tiempoEspera);
+```
+
+El tiempo de espera se obtiene utilizando valores aleatorios.
+
+Esto provoca pausas diferentes durante el procesamiento y permite observar cómo se intercalan las tareas de los distintos repartidores.
+
+También se maneja `InterruptedException` para controlar una posible interrupción durante la pausa.
+
+---
+
+# ⚙️ ExecutorService
+
+La ejecución concurrente se administra mediante `ExecutorService`.
+
+En `Main` se crea un pool de tres hilos:
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(3);
+```
+
+Se envían los tres repartidores al executor:
+
+```java
+executor.submit(repartidorDaniel);
+executor.submit(repartidorNicole);
+executor.submit(repartidorJaime);
+```
+
+Después de enviar las tareas se solicita el cierre:
+
+```java
+executor.shutdown();
+```
+
+Finalmente, el programa espera que las tareas terminen mediante:
+
+```java
+executor.awaitTermination(30, TimeUnit.SECONDS);
+```
+
+De esta forma, el mensaje final se muestra después de que los repartidores hayan completado sus entregas.
+
+---
+
+# 🚚 Repartidores y pedidos
+
+La simulación utiliza tres repartidores con dos pedidos asignados a cada uno:
+
+```text
+Daniel
+├── Pedido #1
+└── Pedido #2
+
+Nicole
+├── Pedido #3
+└── Pedido #4
+
+Jaime
+├── Pedido #5
+└── Pedido #6
+```
+
+Cada repartidor procesa sus pedidos secuencialmente, mientras los tres repartidores son ejecutados mediante `ExecutorService`.
+
+---
+
 # 💻 Tecnologías utilizadas
 
 - Java JDK 26.
@@ -282,11 +409,15 @@ es posible visualizar los eventos que realmente fueron realizados sobre cada ped
 
 1. Abrir el proyecto `SpeedFast` en IntelliJ IDEA.
 2. Ejecutar la clase `Main.java`.
-3. El sistema mostrará los tres tipos de pedidos.
+3. El sistema mostrará los diferentes tipos de pedidos.
 4. Se calculará el tiempo estimado de entrega.
 5. Se realizará la asignación automática o manual de repartidores.
 6. Se ejecutarán operaciones de despacho o cancelación.
-7. Finalmente, se mostrará el historial de cada pedido.
+7. Se mostrará el historial de los pedidos.
+8. Se crearán tres repartidores con dos pedidos asignados a cada uno.
+9. Los repartidores serán enviados al `ExecutorService`.
+10. Las entregas se ejecutarán concurrentemente.
+11. El programa esperará hasta que todos los repartidores finalicen.
 
 ---
 
@@ -353,7 +484,33 @@ Historial del PedidoExpress #3:
 - Pedido express cancelado.
 
 ========================================
+        ENTREGAS CONCURRENTES
+========================================
+
+Repartidor Daniel inicia sus entregas.
+Repartidor Daniel procesando pedido #1
+Repartidor Nicole inicia sus entregas.
+Repartidor Jaime inicia sus entregas.
+Repartidor Jaime procesando pedido #5
+Repartidor Nicole procesando pedido #3
+Repartidor Jaime completo el pedido #5
+Repartidor Jaime procesando pedido #6
+Repartidor Daniel completo el pedido #1
+Repartidor Daniel procesando pedido #2
+Repartidor Nicole completo el pedido #3
+Repartidor Nicole procesando pedido #4
+Repartidor Daniel completo el pedido #2
+Repartidor Daniel termino sus entregas.
+Repartidor Jaime completo el pedido #6
+Repartidor Jaime termino sus entregas.
+Repartidor Nicole completo el pedido #4
+Repartidor Nicole termino sus entregas.
+
+Todos los repartidores finalizaron sus entregas.
+========================================
 ```
+
+> El orden de los mensajes de los repartidores puede cambiar entre ejecuciones debido a la ejecución concurrente.
 
 ---
 
@@ -379,8 +536,21 @@ Historial del PedidoExpress #3:
 - Cancelación de pedidos.
 - Registro de eventos mediante `ArrayList`.
 - Visualización del historial.
+- Clase `Repartidor`.
+- Implementación de `Runnable`.
+- Procesamiento secuencial de pedidos por repartidor.
+- Simulación de entregas mediante `Thread.sleep()`.
+- Uso de tiempos aleatorios.
+- Manejo de `InterruptedException`.
+- Ejecución concurrente de repartidores.
+- Administración de tareas mediante `ExecutorService`.
+- Pool de tres hilos mediante `newFixedThreadPool(3)`.
+- Envío de tareas mediante `submit()`.
+- Cierre del executor mediante `shutdown()`.
+- Espera de finalización mediante `awaitTermination()`.
+- Tres repartidores con dos pedidos cada uno.
 - Reutilización de código.
-- Salida ordenada por consola.
+- Salida ordenada y comprensible por consola.
 - Documentación mediante Javadoc.
 - Control de versiones mediante Git y GitHub.
 
@@ -392,21 +562,27 @@ La clase abstracta `Pedido` centraliza los atributos y comportamientos comunes, 
 
 Cada subclase contiene las reglas específicas correspondientes a su tipo de pedido.
 
-Las interfaces permiten separar capacidades como despacho, cancelación y rastreo de la jerarquía principal, facilitando la incorporación de nuevos tipos de pedidos o comportamientos en el futuro.
+Las interfaces permiten separar capacidades como despacho, cancelación y rastreo de la jerarquía principal.
 
-Esta estructura permite mantener el proyecto organizado, reutilizable y más fácil de modificar.
+Durante la Semana 4, la clase `Repartidor` permite separar la tarea de entrega de la administración de los hilos. `Repartidor` representa la tarea mediante `Runnable`, mientras que `ExecutorService` administra su ejecución.
+
+De esta manera, el proyecto conserva la estructura desarrollada durante las semanas anteriores e incorpora la ejecución concurrente sin reemplazar el modelo existente.
 
 ---
 
 # ✅ Conclusión
 
-El proyecto **SpeedFast** integra los principales conceptos trabajados durante las primeras tres semanas de Programación Orientado a Objetos II.
+El proyecto **SpeedFast** integra los conceptos trabajados durante las primeras cuatro semanas de Programación Orientado a Objetos II.
 
 La clase abstracta `Pedido` permite centralizar información y comportamientos comunes, mientras que `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` especializan sus reglas mediante herencia, sobrecarga, sobrescritura y polimorfismo.
 
-La incorporación de las interfaces `Despachable`, `Cancelable` y `Rastreable` permite separar diferentes capacidades de los pedidos y mejorar la organización del sistema.
+Las interfaces `Despachable`, `Cancelable` y `Rastreable` permiten representar diferentes capacidades de los pedidos y mantener organizada la estructura del sistema.
 
-Finalmente, el historial permite registrar las acciones realizadas sobre cada pedido, demostrando el funcionamiento integrado del sistema mediante la ejecución de diferentes casos en `Main`.
+Durante la Semana 4 se incorpora concurrencia mediante la clase `Repartidor`, que implementa `Runnable` y procesa secuencialmente los pedidos asignados.
+
+La utilización de `Thread.sleep()` permite simular tiempos de entrega, mientras que `ExecutorService` administra la ejecución concurrente de tres repartidores.
+
+Finalmente, el programa espera la finalización de todas las tareas y muestra por consola el avance de las entregas, permitiendo observar el funcionamiento concurrente del sistema.
 
 ---
 
