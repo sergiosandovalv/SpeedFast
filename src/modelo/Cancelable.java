@@ -1,3 +1,5 @@
+package modelo;
+
 /**
  * Interfaz que define el comportamiento de cancelacion
  * para los pedidos del sistema SpeedFast.

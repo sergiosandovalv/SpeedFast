@@ -1,3 +1,5 @@
+package modelo;
+
 /**
  * Clase que representa a un repartidor dentro del sistema SpeedFast.
  * Cada repartidor funciona como una tarea concurrente y obtiene

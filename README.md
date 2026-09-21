@@ -88,17 +88,17 @@ SpeedFast/
 ├── .gitignore
 ├── README.md
 └── src/
-    ├── Cancelable.java
-    ├── Despachable.java
-    ├── EstadoPedido.java
-    ├── Main.java
-    ├── Pedido.java
-    ├── PedidoComida.java
-    ├── PedidoEncomienda.java
-    ├── PedidoExpress.java
-    ├── Rastreable.java
-    ├── Repartidor.java
-    └── ZonaDeCarga.java
+    ├── modelo.Cancelable.java
+    ├── modelo.Despachable.java
+    ├── modelo.EstadoPedido.java
+    ├── main.Main.java
+    ├── modelo.Pedido.java
+    ├── modelo.PedidoComida.java
+    ├── modelo.PedidoEncomienda.java
+    ├── modelo.PedidoExpress.java
+    ├── modelo.Rastreable.java
+    ├── modelo.Repartidor.java
+    └── modelo.ZonaDeCarga.java
 ```
 
 ---
@@ -108,13 +108,13 @@ SpeedFast/
 El siguiente diagrama representa la estructura principal del sistema, mostrando la herencia desde la clase abstracta `Pedido`, las interfaces implementadas por las clases concretas y la relación entre `Repartidor` y la zona de carga compartida.
 
 ```text
-                               Pedido
+                               modelo.Pedido
                             <<abstracta>>
                                  │
                  ┌───────────────┼────────────────┐
                  │               │                │
                  ▼               ▼                ▼
-           PedidoComida   PedidoEncomienda   PedidoExpress
+           modelo.PedidoComida   modelo.PedidoEncomienda   modelo.PedidoExpress
                  │               │                │
                  └───────────────┼────────────────┘
                                  │
@@ -123,24 +123,24 @@ El siguiente diagrama representa la estructura principal del sistema, mostrando 
                  ┌───────────────┼────────────────┐
                  │               │                │
                  ▼               ▼                ▼
-           Despachable       Cancelable       Rastreable
+           modelo.Despachable       modelo.Cancelable       modelo.Rastreable
           <<interface>>     <<interface>>     <<interface>>
 
 
-                       EstadoPedido
+                       modelo.EstadoPedido
                           <<enum>>
                              │
           PENDIENTE - EN_REPARTO - ENTREGADO
 
 
-                        ZonaDeCarga
+                        modelo.ZonaDeCarga
                              │
-                       List<Pedido>
+                       List<modelo.Pedido>
                              │
                        synchronized
                              │
                              ▼
-                        Repartidor
+                        modelo.Repartidor
                              │
                     implements Runnable
                              │
@@ -165,7 +165,7 @@ El siguiente diagrama representa la estructura principal del sistema, mostrando 
 La clase `Pedido` se define como abstracta:
 
 ```java
-public abstract class Pedido
+public abstract class modelo.Pedido
 ```
 
 Esto permite utilizarla como base de la jerarquía sin crear objetos `Pedido` directamente.
@@ -184,7 +184,7 @@ Cada subclase implementa este método de acuerdo con sus propias reglas para cal
 
 Cada tipo de pedido implementa un comportamiento diferente.
 
-### PedidoComida
+### modelo.PedidoComida
 
 Calcula **15 minutos base más 2 minutos por kilómetro**.
 
@@ -192,7 +192,7 @@ Calcula **15 minutos base más 2 minutos por kilómetro**.
 15 + (2 × distancia)
 ```
 
-### PedidoEncomienda
+### modelo.PedidoEncomienda
 
 Calcula **20 minutos base más 1.5 minutos por kilómetro**, ajustando el resultado a minutos enteros.
 
@@ -200,7 +200,7 @@ Calcula **20 minutos base más 1.5 minutos por kilómetro**, ajustando el result
 20 + (1.5 × distancia)
 ```
 
-### PedidoExpress
+### modelo.PedidoExpress
 
 Considera **10 minutos base** y agrega **5 minutos adicionales** cuando la distancia supera los 5 kilómetros.
 
@@ -242,6 +242,11 @@ Por ejemplo:
 En `Main`, los objetos se declaran utilizando referencias de tipo `Pedido`:
 
 ```java
+import modelo.Pedido;
+import modelo.PedidoComida;
+import modelo.PedidoEncomienda;
+import modelo.PedidoExpress;
+
 Pedido pedido1 = new PedidoComida(...);
 Pedido pedido2 = new PedidoEncomienda(...);
 Pedido pedido3 = new PedidoExpress(...);
@@ -257,7 +262,7 @@ Esto permite utilizar una estructura común y mantener comportamientos diferente
 
 Durante la Semana 3 se incorporan tres interfaces.
 
-### Despachable
+### modelo.Despachable
 
 Define la capacidad de despachar un pedido:
 
@@ -265,7 +270,7 @@ Define la capacidad de despachar un pedido:
 void despachar();
 ```
 
-### Cancelable
+### modelo.Cancelable
 
 Define la capacidad de cancelar un pedido:
 
@@ -273,7 +278,7 @@ Define la capacidad de cancelar un pedido:
 void cancelar();
 ```
 
-### Rastreable
+### modelo.Rastreable
 
 Define la capacidad de consultar el historial de un pedido:
 
@@ -315,7 +320,7 @@ es posible visualizar los eventos registrados para cada pedido.
 Durante la Semana 4 se incorporó la clase `Repartidor` como una tarea concurrente mediante:
 
 ```java
-public class Repartidor implements Runnable
+public class modelo.Repartidor implements Runnable
 ```
 
 La ejecución de los repartidores es administrada mediante un `ExecutorService`, permitiendo que varias tareas avancen concurrentemente.
@@ -331,18 +336,24 @@ Durante la Semana 5 se incorpora la clase `ZonaDeCarga` como recurso compartido 
 La clase mantiene una lista de pedidos:
 
 ```java
+import modelo.Pedido;
+
 private List<Pedido> pedidos;
 ```
 
 El acceso a esta lista se controla mediante métodos sincronizados:
 
 ```java
+import modelo.Pedido;
+
 public synchronized void agregarPedido(Pedido pedido)
 ```
 
 y:
 
 ```java
+import modelo.Pedido;
+
 public synchronized Pedido retirarPedido()
 ```
 
@@ -357,7 +368,7 @@ De esta forma se evita que dos repartidores retiren el mismo pedido desde la zon
 Se incorpora el enum:
 
 ```java
-public enum EstadoPedido
+public enum modelo.EstadoPedido
 ```
 
 con tres estados:
@@ -455,12 +466,12 @@ Los tres reciben la **misma instancia de `ZonaDeCarga`**.
 Antes de iniciar las tareas se agregan seis pedidos al recurso compartido:
 
 ```text
-Pedido #1
-Pedido #2
-Pedido #3
-Pedido #4
-Pedido #5
-Pedido #6
+modelo.Pedido #1
+modelo.Pedido #2
+modelo.Pedido #3
+modelo.Pedido #4
+modelo.Pedido #5
+modelo.Pedido #6
 ```
 
 Los pedidos **no están asignados previamente a un repartidor específico**.
@@ -482,7 +493,7 @@ Cada repartidor solicita el siguiente pedido disponible a `ZonaDeCarga`. Por est
 # 🚀 Ejecución
 
 1. Abrir el proyecto `SpeedFast` en IntelliJ IDEA.
-2. Ejecutar la clase `Main.java`.
+2. Ejecutar la clase `main.Main.java`.
 3. El sistema crea seis pedidos.
 4. Los pedidos comienzan con estado `PENDIENTE`.
 5. Se crea una instancia compartida de `ZonaDeCarga`.
@@ -507,36 +518,36 @@ Cada repartidor solicita el siguiente pedido disponible a `ZonaDeCarga`. Por est
 
       ZONA DE CARGA COMPARTIDA
 ----------------------------------------
-Pedido #1 agregado a la zona de carga.
-Pedido #2 agregado a la zona de carga.
-Pedido #3 agregado a la zona de carga.
-Pedido #4 agregado a la zona de carga.
-Pedido #5 agregado a la zona de carga.
-Pedido #6 agregado a la zona de carga.
+modelo.Pedido #1 agregado a la zona de carga.
+modelo.Pedido #2 agregado a la zona de carga.
+modelo.Pedido #3 agregado a la zona de carga.
+modelo.Pedido #4 agregado a la zona de carga.
+modelo.Pedido #5 agregado a la zona de carga.
+modelo.Pedido #6 agregado a la zona de carga.
 
 ========================================
         ENTREGAS CONCURRENTES
 ========================================
 
-[Repartidor - Daniel] inicia sus entregas.
-[Repartidor - Nicole] inicia sus entregas.
-[Repartidor - Jaime] inicia sus entregas.
+[modelo.Repartidor - Daniel] inicia sus entregas.
+[modelo.Repartidor - Nicole] inicia sus entregas.
+[modelo.Repartidor - Jaime] inicia sus entregas.
 
-[Repartidor - Daniel] Retirando pedido #1
-[Repartidor - Daniel] Estado: EN_REPARTO
-[Repartidor - Nicole] Retirando pedido #2
-[Repartidor - Nicole] Estado: EN_REPARTO
-[Repartidor - Jaime] Retirando pedido #3
-[Repartidor - Jaime] Estado: EN_REPARTO
+[modelo.Repartidor - Daniel] Retirando pedido #1
+[modelo.Repartidor - Daniel] Estado: EN_REPARTO
+[modelo.Repartidor - Nicole] Retirando pedido #2
+[modelo.Repartidor - Nicole] Estado: EN_REPARTO
+[modelo.Repartidor - Jaime] Retirando pedido #3
+[modelo.Repartidor - Jaime] Estado: EN_REPARTO
 
 ...
 
-[Repartidor - Daniel] Pedido #4 entregado.
-[Repartidor - Daniel] Estado: ENTREGADO
-[Repartidor - Nicole] Pedido #5 entregado.
-[Repartidor - Nicole] Estado: ENTREGADO
-[Repartidor - Jaime] Pedido #6 entregado.
-[Repartidor - Jaime] Estado: ENTREGADO
+[modelo.Repartidor - Daniel] modelo.Pedido #4 entregado.
+[modelo.Repartidor - Daniel] Estado: ENTREGADO
+[modelo.Repartidor - Nicole] modelo.Pedido #5 entregado.
+[modelo.Repartidor - Nicole] Estado: ENTREGADO
+[modelo.Repartidor - Jaime] modelo.Pedido #6 entregado.
+[modelo.Repartidor - Jaime] Estado: ENTREGADO
 
 ========================================
 Todos los pedidos han sido entregados correctamente

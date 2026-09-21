@@ -1,3 +1,5 @@
+package modelo;
+
 /**
  * Enum que representa los estados posibles de un pedido
  * dentro del sistema SpeedFast.

@@ -1,3 +1,5 @@
+package modelo;
+
 /**
  * Clase que representa un pedido de comida dentro del sistema SpeedFast.
  * Hereda los atributos y comportamientos generales de la clase Pedido.

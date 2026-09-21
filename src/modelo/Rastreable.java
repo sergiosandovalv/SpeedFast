@@ -1,3 +1,5 @@
+package modelo;
+
 /**
  * Interfaz que define el comportamiento de rastreo
  * para los pedidos del sistema SpeedFast.
