@@ -18,13 +18,15 @@
 
 Este repositorio contiene el desarrollo del proyecto **SpeedFast**, realizado para la asignatura **Programación Orientado a Objetos II**.
 
-Durante las primeras cuatro semanas, el proyecto integra conceptos de herencia, polimorfismo, abstracción e interfaces para representar diferentes tipos de pedidos y sus capacidades.
+Durante las primeras semanas, el proyecto integra conceptos de herencia, polimorfismo, abstracción e interfaces para representar diferentes tipos de pedidos y sus capacidades.
 
 Durante la **Semana 4**, el proyecto incorpora concurrencia para simular que varios repartidores realizan entregas durante el mismo período de tiempo.
 
 Durante la **Semana 5**, el sistema incorpora sincronización para controlar el acceso concurrente a una zona de carga compartida. Los repartidores obtienen pedidos desde este recurso común de forma segura, evitando que un mismo pedido sea retirado por más de un repartidor.
 
-Para ello se incorporan `ZonaDeCarga` y `EstadoPedido`, manteniendo el uso de `Runnable`, `Thread.sleep()` y `ExecutorService` para ejecutar concurrentemente las tareas de los repartidores.
+Durante la **Semana 6**, el proyecto incorpora una interfaz gráfica desarrollada con **Java Swing**, permitiendo registrar pedidos, visualizar los pedidos almacenados e iniciar el proceso de entrega desde una ventana principal.
+
+Además, el proyecto se organiza mediante los paquetes `main`, `modelo` y `vista`, separando la ejecución de la aplicación, la lógica del sistema y la interfaz gráfica.
 
 ---
 
@@ -39,6 +41,8 @@ Mediante las interfaces `Despachable`, `Cancelable` y `Rastreable`, se incorpora
 Durante la Semana 4 se incorpora la ejecución concurrente de repartidores mediante `Runnable` y `ExecutorService`.
 
 Durante la Semana 5 se incorpora una `ZonaDeCarga` compartida y sincronizada, permitiendo que varios repartidores retiren y procesen pedidos de forma concurrente sin duplicar su procesamiento.
+
+Durante la Semana 6 se incorpora una interfaz gráfica mediante Java Swing y un `ControladorPedidos` compartido entre las ventanas, permitiendo administrar los pedidos registrados desde la aplicación.
 
 ---
 
@@ -71,10 +75,22 @@ Durante la Semana 5 se incorpora una `ZonaDeCarga` compartida y sincronizada, pe
 - Uso de `newFixedThreadPool()`.
 - Envío de tareas mediante `submit()`.
 - Cierre mediante `shutdown()`.
-- Espera de finalización mediante `awaitTermination()`.
 - Recursos compartidos.
 - Secciones críticas.
 - Sincronización mediante `synchronized`.
+- Interfaz gráfica mediante Java Swing.
+- Uso de `JFrame`.
+- Uso de `JPanel`.
+- Uso de `JButton`.
+- Uso de `JLabel`.
+- Uso de `JTextField`.
+- Uso de `JComboBox`.
+- Uso de `JTable`.
+- Uso de `JScrollPane`.
+- Uso de `JOptionPane`.
+- Uso de `SwingUtilities.invokeLater()`.
+- Manejo de eventos mediante `ActionListener`.
+- Organización del proyecto mediante paquetes.
 - Control de versiones mediante Git.
 - Publicación del proyecto en GitHub.
 
@@ -87,75 +103,120 @@ SpeedFast/
 │
 ├── .gitignore
 ├── README.md
+│
 └── src/
-    ├── modelo.Cancelable.java
-    ├── modelo.Despachable.java
-    ├── modelo.EstadoPedido.java
-    ├── main.Main.java
-    ├── modelo.Pedido.java
-    ├── modelo.PedidoComida.java
-    ├── modelo.PedidoEncomienda.java
-    ├── modelo.PedidoExpress.java
-    ├── modelo.Rastreable.java
-    ├── modelo.Repartidor.java
-    └── modelo.ZonaDeCarga.java
+    │
+    ├── main/
+    │   └── Main.java
+    │
+    ├── modelo/
+    │   ├── Cancelable.java
+    │   ├── ControladorPedidos.java
+    │   ├── Despachable.java
+    │   ├── EstadoPedido.java
+    │   ├── Pedido.java
+    │   ├── PedidoComida.java
+    │   ├── PedidoEncomienda.java
+    │   ├── PedidoExpress.java
+    │   ├── Rastreable.java
+    │   ├── Repartidor.java
+    │   └── ZonaDeCarga.java
+    │
+    └── vista/
+        ├── VentanaListaPedidos.java
+        ├── VentanaPrincipal.java
+        └── VentanaRegistroPedido.java
 ```
 
 ---
 
-# 📊 Diagrama de clases
+# 📦 Organización mediante paquetes
 
-El siguiente diagrama representa la estructura principal del sistema, mostrando la herencia desde la clase abstracta `Pedido`, las interfaces implementadas por las clases concretas y la relación entre `Repartidor` y la zona de carga compartida.
+Durante la Semana 6 el proyecto se organiza en tres paquetes principales.
+
+### `main`
+
+Contiene la clase `Main`, encargada de iniciar la aplicación.
+
+### `modelo`
+
+Contiene las clases relacionadas con la lógica y los datos del sistema:
+
+- `Pedido`.
+- `PedidoComida`.
+- `PedidoEncomienda`.
+- `PedidoExpress`.
+- `ControladorPedidos`.
+- `Repartidor`.
+- `ZonaDeCarga`.
+- `EstadoPedido`.
+- `Despachable`.
+- `Cancelable`.
+- `Rastreable`.
+
+### `vista`
+
+Contiene las clases relacionadas con la interfaz gráfica:
+
+- `VentanaPrincipal`.
+- `VentanaRegistroPedido`.
+- `VentanaListaPedidos`.
+
+Esta organización permite separar las responsabilidades del sistema y mantener una estructura más ordenada.
+
+---
+
+# 📊 Diagrama general de clases
+
+El siguiente diagrama representa de forma simplificada la estructura principal del sistema.
 
 ```text
-                               modelo.Pedido
-                            <<abstracta>>
-                                 │
-                 ┌───────────────┼────────────────┐
-                 │               │                │
-                 ▼               ▼                ▼
-           modelo.PedidoComida   modelo.PedidoEncomienda   modelo.PedidoExpress
-                 │               │                │
-                 └───────────────┼────────────────┘
-                                 │
-                     implementan las interfaces
-                                 │
-                 ┌───────────────┼────────────────┐
-                 │               │                │
-                 ▼               ▼                ▼
-           modelo.Despachable       modelo.Cancelable       modelo.Rastreable
-          <<interface>>     <<interface>>     <<interface>>
+                              Pedido
+                           <<abstracta>>
+                                │
+              ┌─────────────────┼─────────────────┐
+              │                 │                 │
+              ▼                 ▼                 ▼
+        PedidoComida     PedidoEncomienda    PedidoExpress
+              │                 │                 │
+              └─────────────────┼─────────────────┘
+                                │
+                       implementan interfaces
+                                │
+              ┌─────────────────┼─────────────────┐
+              │                 │                 │
+              ▼                 ▼                 ▼
+        Despachable         Cancelable        Rastreable
+        <<interface>>       <<interface>>      <<interface>>
 
 
-                       modelo.EstadoPedido
-                          <<enum>>
-                             │
-          PENDIENTE - EN_REPARTO - ENTREGADO
+                          EstadoPedido
+                             <<enum>>
+                                │
+                 PENDIENTE - EN_REPARTO - ENTREGADO
 
 
-                        modelo.ZonaDeCarga
-                             │
-                       List<modelo.Pedido>
-                             │
-                       synchronized
-                             │
-                             ▼
-                        modelo.Repartidor
-                             │
-                    implements Runnable
-                             │
-                           run()
+                          ZonaDeCarga
+                                │
+                         List<Pedido>
+                                │
+                         synchronized
+                                │
+                                ▼
+                           Repartidor
+                                │
+                      implements Runnable
+
+
+                       ControladorPedidos
+                                │
+                         List<Pedido>
+                                │
+             ┌──────────────────┼──────────────────┐
+             │                  │                  │
+             ▼                  ▼                  ▼
+     VentanaPrincipal   VentanaRegistroPedido  VentanaListaPedidos
 ```
-
-### 📌 Leyenda del diagrama
-
-- **`Pedido`** es la clase abstracta que contiene los atributos y comportamientos comunes.
-- **`PedidoComida`**, **`PedidoEncomienda`** y **`PedidoExpress`** son clases concretas que heredan de `Pedido`.
-- **`Despachable`**, **`Cancelable`** y **`Rastreable`** representan capacidades de los pedidos.
-- **`EstadoPedido`** define los estados `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
-- **`ZonaDeCarga`** contiene la lista compartida de pedidos y utiliza métodos `synchronized` para controlar el acceso concurrente.
-- **`Repartidor`** implementa `Runnable` y comparte una referencia a `ZonaDeCarga`.
-- Los repartidores retiran pedidos desde la misma zona de carga.
 
 ---
 
@@ -164,7 +225,7 @@ El siguiente diagrama representa la estructura principal del sistema, mostrando 
 La clase `Pedido` se define como abstracta:
 
 ```java
-public abstract class modelo.Pedido
+public abstract class Pedido
 ```
 
 Esto permite utilizarla como base de la jerarquía sin crear objetos `Pedido` directamente.
@@ -183,7 +244,7 @@ Cada subclase implementa este método de acuerdo con sus propias reglas para cal
 
 Cada tipo de pedido implementa un comportamiento diferente.
 
-### modelo.PedidoComida
+### PedidoComida
 
 Calcula **15 minutos base más 2 minutos por kilómetro**.
 
@@ -191,7 +252,7 @@ Calcula **15 minutos base más 2 minutos por kilómetro**.
 15 + (2 × distancia)
 ```
 
-### modelo.PedidoEncomienda
+### PedidoEncomienda
 
 Calcula **20 minutos base más 1.5 minutos por kilómetro**, ajustando el resultado a minutos enteros.
 
@@ -199,7 +260,7 @@ Calcula **20 minutos base más 1.5 minutos por kilómetro**, ajustando el result
 20 + (1.5 × distancia)
 ```
 
-### modelo.PedidoExpress
+### PedidoExpress
 
 Considera **10 minutos base** y agrega **5 minutos adicionales** cuando la distancia supera los 5 kilómetros.
 
@@ -238,20 +299,19 @@ Por ejemplo:
 
 # 🔄 Polimorfismo
 
-En `Main`, los objetos se declaran utilizando referencias de tipo `Pedido`:
+Los diferentes tipos de pedidos pueden ser administrados mediante referencias de tipo `Pedido`.
+
+Por ejemplo:
 
 ```java
-import modelo.Pedido;
-import modelo.PedidoComida;
-import modelo.PedidoEncomienda;
-import modelo.PedidoExpress;
+Pedido pedido;
 
-Pedido pedido1 = new PedidoComida(...);
-Pedido pedido2 = new PedidoEncomienda(...);
-Pedido pedido3 = new PedidoExpress(...);
+pedido = new PedidoComida(...);
+pedido = new PedidoEncomienda(...);
+pedido = new PedidoExpress(...);
 ```
 
-Aunque las referencias son de tipo `Pedido`, cada objeto mantiene el comportamiento correspondiente a su clase real.
+Aunque la referencia es de tipo `Pedido`, cada objeto mantiene el comportamiento correspondiente a su clase real.
 
 Esto permite utilizar una estructura común y mantener comportamientos diferentes para cada tipo de pedido.
 
@@ -261,7 +321,7 @@ Esto permite utilizar una estructura común y mantener comportamientos diferente
 
 El sistema incorpora tres interfaces para representar diferentes capacidades de los pedidos.
 
-### modelo.Despachable
+### Despachable
 
 Define la capacidad de despachar un pedido:
 
@@ -269,7 +329,7 @@ Define la capacidad de despachar un pedido:
 void despachar();
 ```
 
-### modelo.Cancelable
+### Cancelable
 
 Define la capacidad de cancelar un pedido:
 
@@ -277,7 +337,7 @@ Define la capacidad de cancelar un pedido:
 void cancelar();
 ```
 
-### modelo.Rastreable
+### Rastreable
 
 Define la capacidad de consultar el historial de un pedido:
 
@@ -285,7 +345,7 @@ Define la capacidad de consultar el historial de un pedido:
 void verHistorial();
 ```
 
-Las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` implementan estas interfaces y proporcionan su propio comportamiento.
+Las clases concretas implementan estas interfaces según las capacidades definidas en el sistema.
 
 De esta manera, la jerarquía representa qué tipo de objeto es cada pedido, mientras que las interfaces representan las capacidades que puede realizar.
 
@@ -319,12 +379,12 @@ es posible visualizar los eventos registrados para cada pedido.
 Durante la Semana 4 se incorporó la clase `Repartidor` como una tarea concurrente mediante:
 
 ```java
-public class modelo.Repartidor implements Runnable
+public class Repartidor implements Runnable
 ```
 
 La ejecución de los repartidores es administrada mediante un `ExecutorService`, permitiendo que varias tareas avancen concurrentemente.
 
-Este concepto se mantiene durante la Semana 5, pero se modifica la forma en que los repartidores obtienen los pedidos.
+Este concepto continúa siendo utilizado en las semanas siguientes.
 
 ---
 
@@ -332,27 +392,17 @@ Este concepto se mantiene durante la Semana 5, pero se modifica la forma en que 
 
 Durante la Semana 5 se incorpora la clase `ZonaDeCarga` como recurso compartido entre los repartidores.
 
-La clase mantiene una lista de pedidos:
-
-```java
-import modelo.Pedido;
-
-private List<Pedido> pedidos;
-```
+La clase mantiene una lista de pedidos.
 
 El acceso a esta lista se controla mediante métodos sincronizados:
 
 ```java
-import modelo.Pedido;
-
 public synchronized void agregarPedido(Pedido pedido)
 ```
 
 y:
 
 ```java
-import modelo.Pedido;
-
 public synchronized Pedido retirarPedido()
 ```
 
@@ -364,10 +414,10 @@ De esta forma se evita que dos repartidores retiren el mismo pedido desde la zon
 
 # 🚦 Estados de los pedidos
 
-Se incorpora el enum:
+El sistema incorpora el enum:
 
 ```java
-public enum modelo.EstadoPedido
+public enum EstadoPedido
 ```
 
 con tres estados:
@@ -378,7 +428,7 @@ EN_REPARTO
 ENTREGADO
 ```
 
-Todos los pedidos comienzan en:
+Todos los pedidos comienzan con estado:
 
 ```text
 PENDIENTE
@@ -396,7 +446,7 @@ Después de completar la entrega:
 EN_REPARTO -> ENTREGADO
 ```
 
-Esto permite representar el avance del pedido durante la simulación concurrente.
+Esto permite representar el avance del pedido durante el proceso de entrega.
 
 ---
 
@@ -420,18 +470,19 @@ También se maneja `InterruptedException` para controlar una posible interrupci�
 
 La ejecución concurrente se administra mediante `ExecutorService`.
 
-En `Main` se crea un pool de tres hilos:
+El sistema utiliza un pool de tres hilos:
 
 ```java
-ExecutorService executor = Executors.newFixedThreadPool(3);
+ExecutorService executor =
+        Executors.newFixedThreadPool(3);
 ```
 
-Se envían los tres repartidores al executor:
+Los repartidores son enviados al executor mediante:
 
 ```java
-executor.submit(repartidorDaniel);
-executor.submit(repartidorNicole);
-executor.submit(repartidorJaime);
+executor.submit(repartidor1);
+executor.submit(repartidor2);
+executor.submit(repartidor3);
 ```
 
 Después de enviar las tareas se solicita el cierre:
@@ -440,13 +491,7 @@ Después de enviar las tareas se solicita el cierre:
 executor.shutdown();
 ```
 
-Finalmente, el programa espera que las tareas terminen mediante:
-
-```java
-executor.awaitTermination(30, TimeUnit.SECONDS);
-```
-
-De esta forma, el mensaje final se muestra después de que los repartidores hayan completado sus entregas.
+De esta forma los repartidores pueden procesar los pedidos concurrentemente.
 
 ---
 
@@ -460,28 +505,212 @@ Nicole
 Jaime
 ```
 
-Los tres reciben la **misma instancia de `ZonaDeCarga`**.
+Los tres reciben la misma instancia de `ZonaDeCarga`.
 
-Antes de iniciar las tareas se agregan seis pedidos al recurso compartido:
+Los pedidos pendientes son agregados al recurso compartido cuando el usuario selecciona la opción para iniciar las entregas.
+
+Los pedidos no están asignados previamente a un repartidor específico.
+
+Cada repartidor solicita el siguiente pedido disponible a `ZonaDeCarga`.
+
+Por este motivo, la distribución de los pedidos entre Daniel, Nicole y Jaime puede cambiar entre ejecuciones.
+
+---
+
+# 🖥️ Interfaz gráfica – Semana 6
+
+Durante la Semana 6 se incorpora una interfaz gráfica desarrollada mediante **Java Swing**.
+
+La interfaz permite utilizar las principales funciones del sistema mediante ventanas y botones, sin depender exclusivamente de la interacción por consola.
+
+La ventana principal contiene las siguientes opciones:
 
 ```text
-modelo.Pedido #1
-modelo.Pedido #2
-modelo.Pedido #3
-modelo.Pedido #4
-modelo.Pedido #5
-modelo.Pedido #6
+Registrar pedido
+Listar pedidos
+Asignar repartidor / Iniciar entrega
+Salir de la aplicacion
 ```
 
-Los pedidos **no están asignados previamente a un repartidor específico**.
+La interfaz gráfica mantiene la lógica desarrollada durante las semanas anteriores y permite acceder a ella de una forma más organizada.
 
-Cada repartidor solicita el siguiente pedido disponible a `ZonaDeCarga`. Por este motivo, la distribución de pedidos entre Daniel, Nicole y Jaime puede cambiar entre ejecuciones.
+---
+
+# 🏠 Ventana principal
+
+La clase `VentanaPrincipal` representa el menú principal de SpeedFast.
+
+Desde esta ventana el usuario puede:
+
+- Abrir el formulario de registro.
+- Consultar los pedidos almacenados.
+- Iniciar el proceso de entrega.
+- Salir de la aplicación.
+
+La ventana utiliza botones de Swing y eventos para ejecutar cada una de estas acciones.
+
+---
+
+# 📝 Registro de pedidos
+
+La clase `VentanaRegistroPedido` permite ingresar los datos necesarios para crear un nuevo pedido.
+
+El formulario solicita:
+
+```text
+ID
+Direccion
+Distancia (km)
+Tipo
+```
+
+El tipo de pedido se selecciona mediante un `JComboBox`:
+
+```text
+Comida
+Encomienda
+Express
+```
+
+Dependiendo de la selección realizada se crea una instancia de:
+
+```text
+PedidoComida
+PedidoEncomienda
+PedidoExpress
+```
+
+El formulario también valida que los campos estén completos, que el ID sea un número entero y que la distancia ingresada sea válida y mayor que cero.
+
+Cuando el pedido se registra correctamente, el sistema muestra un mensaje mediante `JOptionPane`.
+
+La ventana incorpora además un botón **Volver**, que permite cerrarla y regresar a la ventana principal.
+
+---
+
+# 📋 Lista de pedidos
+
+La clase `VentanaListaPedidos` permite visualizar los pedidos registrados mediante un `JTable`.
+
+La tabla contiene las columnas:
+
+```text
+ID
+Direccion
+Distancia (km)
+Tipo
+Estado
+```
+
+La información mostrada proviene del `ControladorPedidos` compartido por las ventanas.
+
+La tabla se utiliza solamente para visualizar información, por lo que sus celdas no pueden ser modificadas directamente por el usuario.
+
+Esto permite proteger los datos mostrados y evita modificaciones accidentales desde la tabla.
+
+La ventana también incorpora un botón **Volver** para regresar al menú principal.
+
+---
+
+# 🎮 Controlador de pedidos
+
+La clase `ControladorPedidos` administra los pedidos utilizados por la aplicación.
+
+El mismo controlador es compartido entre las distintas ventanas.
+
+De esta manera, cuando un pedido es registrado desde `VentanaRegistroPedido`, posteriormente puede ser consultado desde `VentanaListaPedidos` y procesado desde `VentanaPrincipal`.
+
+El controlador permite mantener centralizada la colección de pedidos y separar su administración de la interfaz gráfica.
+
+---
+
+# 🚚 Inicio del proceso de entrega
+
+Desde `VentanaPrincipal`, el usuario puede seleccionar:
+
+```text
+Asignar repartidor / Iniciar entrega
+```
+
+El sistema obtiene los pedidos que se encuentran pendientes y los agrega a una instancia compartida de `ZonaDeCarga`.
+
+Luego se crean tres repartidores:
+
+```text
+Daniel
+Nicole
+Jaime
+```
+
+Los repartidores son ejecutados mediante un `ExecutorService` con tres hilos.
+
+Cada repartidor obtiene pedidos desde la zona de carga compartida y cambia sus estados durante el proceso:
+
+```text
+PENDIENTE
+    ↓
+EN_REPARTO
+    ↓
+ENTREGADO
+```
+
+Gracias a la sincronización de `ZonaDeCarga`, cada pedido es retirado de forma segura y no puede ser procesado simultáneamente por dos repartidores.
+
+---
+
+# 🚪 Salida de la aplicación
+
+La ventana principal incorpora la opción:
+
+```text
+Salir de la aplicacion
+```
+
+Al seleccionar esta opción se muestra un cuadro de confirmación mediante `JOptionPane`.
+
+El usuario puede seleccionar:
+
+```text
+Yes
+No
+```
+
+Si selecciona **Yes**, la aplicación finaliza.
+
+Si selecciona **No**, la aplicación continúa funcionando normalmente.
+
+Esto evita cerrar el programa accidentalmente.
+
+---
+
+# ▶️ Inicio de la interfaz gráfica
+
+La aplicación se inicia desde la clase `Main`.
+
+La creación de la interfaz gráfica se realiza mediante:
+
+```java
+SwingUtilities.invokeLater(() -> {
+    ControladorPedidos controlador =
+            new ControladorPedidos();
+
+    VentanaPrincipal ventana =
+            new VentanaPrincipal(controlador);
+
+    ventana.setVisible(true);
+});
+```
+
+`SwingUtilities.invokeLater()` permite iniciar la interfaz gráfica utilizando el hilo de eventos de Swing.
+
+Además, se crea una única instancia de `ControladorPedidos`, que posteriormente es compartida con las ventanas del sistema.
 
 ---
 
 # 💻 Tecnologías utilizadas
 
 - Java JDK 26.
+- Java Swing.
 - IntelliJ IDEA.
 - Git.
 - GitHub.
@@ -492,68 +721,62 @@ Cada repartidor solicita el siguiente pedido disponible a `ZonaDeCarga`. Por est
 # 🚀 Ejecución
 
 1. Abrir el proyecto `SpeedFast` en IntelliJ IDEA.
-2. Ejecutar la clase `main.Main.java`.
-3. El sistema crea seis pedidos.
-4. Los pedidos comienzan con estado `PENDIENTE`.
-5. Se crea una instancia compartida de `ZonaDeCarga`.
-6. Los seis pedidos son agregados a la zona de carga.
-7. Se crean tres repartidores.
-8. Los tres repartidores comparten la misma zona de carga.
-9. Los repartidores son enviados al `ExecutorService`.
-10. Cada repartidor retira pedidos de forma sincronizada.
-11. Los pedidos cambian a `EN_REPARTO`.
-12. Se simula el tiempo de entrega mediante `Thread.sleep()`.
-13. Los pedidos cambian a `ENTREGADO`.
-14. El programa espera hasta que todos los repartidores finalicen.
+2. Ejecutar la clase `Main.java` del paquete `main`.
+3. Se abre la ventana principal de SpeedFast.
+4. Seleccionar **Registrar pedido**.
+5. Ingresar ID, dirección, distancia y tipo de pedido.
+6. Presionar **Guardar**.
+7. Regresar al menú mediante **Volver**.
+8. Seleccionar **Listar pedidos** para consultar los registros.
+9. Verificar que el pedido se encuentre inicialmente en estado `PENDIENTE`.
+10. Regresar mediante **Volver**.
+11. Seleccionar **Asignar repartidor / Iniciar entrega**.
+12. Los pedidos pendientes son enviados a `ZonaDeCarga`.
+13. Los repartidores procesan los pedidos concurrentemente.
+14. Los pedidos cambian de `PENDIENTE` a `EN_REPARTO`.
+15. Al finalizar la entrega cambian a `ENTREGADO`.
+16. Consultar nuevamente la lista para verificar el estado.
+17. Utilizar **Salir de la aplicacion** para finalizar SpeedFast.
 
 ---
 
-# 🖥️ Ejemplo de salida
+# 🖥️ Ejemplo del proceso
+
+Al registrar un pedido desde la interfaz gráfica:
 
 ```text
-========================================
-          SISTEMA SPEEDFAST
-========================================
-
-      ZONA DE CARGA COMPARTIDA
-----------------------------------------
-modelo.Pedido #1 agregado a la zona de carga.
-modelo.Pedido #2 agregado a la zona de carga.
-modelo.Pedido #3 agregado a la zona de carga.
-modelo.Pedido #4 agregado a la zona de carga.
-modelo.Pedido #5 agregado a la zona de carga.
-modelo.Pedido #6 agregado a la zona de carga.
-
-========================================
-        ENTREGAS CONCURRENTES
-========================================
-
-[modelo.Repartidor - Daniel] inicia sus entregas.
-[modelo.Repartidor - Nicole] inicia sus entregas.
-[modelo.Repartidor - Jaime] inicia sus entregas.
-
-[modelo.Repartidor - Daniel] Retirando pedido #1
-[modelo.Repartidor - Daniel] Estado: EN_REPARTO
-[modelo.Repartidor - Nicole] Retirando pedido #2
-[modelo.Repartidor - Nicole] Estado: EN_REPARTO
-[modelo.Repartidor - Jaime] Retirando pedido #3
-[modelo.Repartidor - Jaime] Estado: EN_REPARTO
-
-...
-
-[modelo.Repartidor - Daniel] modelo.Pedido #4 entregado.
-[modelo.Repartidor - Daniel] Estado: ENTREGADO
-[modelo.Repartidor - Nicole] modelo.Pedido #5 entregado.
-[modelo.Repartidor - Nicole] Estado: ENTREGADO
-[modelo.Repartidor - Jaime] modelo.Pedido #6 entregado.
-[modelo.Repartidor - Jaime] Estado: ENTREGADO
-
-========================================
-Todos los pedidos han sido entregados correctamente
-========================================
+ID: 125
+Direccion: dos sur
+Distancia: 17.0
+Tipo: Encomienda
 ```
 
-> El orden de los repartidores y la distribución de los pedidos puede cambiar entre ejecuciones debido al procesamiento concurrente.
+El pedido queda inicialmente registrado como:
+
+```text
+ID     Direccion     Distancia     Tipo                Estado
+125    dos sur       17.0          PedidoEncomienda    PENDIENTE
+```
+
+Después de iniciar el proceso de entrega, la consola puede mostrar:
+
+```text
+[Repartidor - Nicole] Retirando pedido #125
+[Repartidor - Nicole] Estado: EN_REPARTO
+[Repartidor - Nicole] Entregando pedido #125
+[Repartidor - Nicole] Pedido #125 entregado.
+[Repartidor - Nicole] Estado: ENTREGADO
+[Repartidor - Nicole] termino sus entregas.
+```
+
+Al consultar nuevamente la lista de pedidos:
+
+```text
+ID     Direccion     Distancia     Tipo                Estado
+125    dos sur       17.0          PedidoEncomienda    ENTREGADO
+```
+
+> El repartidor que procesa cada pedido puede cambiar entre ejecuciones debido al procesamiento concurrente.
 
 ---
 
@@ -563,17 +786,12 @@ Todos los pedidos han sido entregados correctamente
 - Creación de pedidos de comida, encomienda y express.
 - Encapsulamiento de atributos comunes.
 - Herencia desde la clase `Pedido`.
-- Método concreto `mostrarResumen()`.
-- Método abstracto `calcularTiempoEntrega()`.
+- Métodos abstractos y concretos.
 - Cálculo de tiempos según el tipo de pedido.
-- Sobrecarga de `asignarRepartidor()`.
+- Sobrecarga de métodos.
 - Sobrescritura mediante `@Override`.
-- Asignación automática de repartidor.
-- Asignación manual de repartidor.
 - Polimorfismo mediante referencias de tipo `Pedido`.
-- Interfaz `Despachable`.
-- Interfaz `Cancelable`.
-- Interfaz `Rastreable`.
+- Interfaces `Despachable`, `Cancelable` y `Rastreable`.
 - Implementación de múltiples interfaces.
 - Registro de eventos mediante `ArrayList`.
 - Visualización del historial.
@@ -592,11 +810,22 @@ Todos los pedidos han sido entregados correctamente
 - Pool de tres hilos mediante `newFixedThreadPool(3)`.
 - Envío de tareas mediante `submit()`.
 - Cierre del executor mediante `shutdown()`.
-- Espera de finalización mediante `awaitTermination()`.
 - Tres repartidores compartiendo la misma zona de carga.
-- Seis pedidos procesados concurrentemente.
-- Reutilización de código.
-- Salida ordenada y comprensible por consola.
+- Organización mediante paquetes `main`, `modelo` y `vista`.
+- Clase `ControladorPedidos`.
+- Controlador compartido entre las ventanas.
+- Interfaz gráfica mediante Java Swing.
+- Ventana principal del sistema.
+- Formulario para registrar pedidos.
+- Validación de datos ingresados.
+- Selección del tipo de pedido mediante `JComboBox`.
+- Visualización de pedidos mediante `JTable`.
+- Tabla de pedidos no editable.
+- Visualización del estado de cada pedido.
+- Botones para volver al menú principal.
+- Inicio de entregas desde la interfaz gráfica.
+- Confirmación para salir de la aplicación.
+- Uso de `SwingUtilities.invokeLater()`.
 - Documentación mediante Javadoc.
 - Control de versiones mediante Git y GitHub.
 
@@ -612,17 +841,21 @@ Las interfaces permiten separar capacidades como despacho, cancelación y rastre
 
 La clase `Repartidor` representa la tarea concurrente mediante `Runnable`, mientras que `ExecutorService` administra su ejecución.
 
-Durante la Semana 5, `ZonaDeCarga` separa la administración del recurso compartido de la lógica del repartidor.
+`ZonaDeCarga` separa la administración del recurso compartido de la lógica del repartidor.
 
-La sincronización se concentra en las operaciones que acceden a la lista compartida, manteniendo separadas las responsabilidades de las clases.
+La sincronización se concentra en las operaciones que acceden a la lista compartida, evitando que un mismo pedido sea retirado por más de un repartidor.
 
-De esta manera, el proyecto conserva la estructura desarrollada durante las semanas anteriores e incorpora sincronización sin reemplazar el modelo existente.
+Durante la Semana 6, `ControladorPedidos` centraliza la administración de los pedidos utilizados por la interfaz gráfica.
+
+La separación mediante los paquetes `main`, `modelo` y `vista` permite mantener organizadas las responsabilidades del sistema.
+
+De esta manera, SpeedFast conserva la estructura desarrollada durante las semanas anteriores e incorpora una interfaz gráfica sin reemplazar la lógica existente.
 
 ---
 
 # ✅ Conclusión
 
-El proyecto **SpeedFast** integra los conceptos trabajados durante las primeras cinco semanas de Programación Orientado a Objetos II.
+El proyecto **SpeedFast** integra los conceptos trabajados durante las primeras seis semanas de Programación Orientado a Objetos II.
 
 La clase abstracta `Pedido` permite centralizar información y comportamientos comunes, mientras que `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` especializan sus reglas mediante herencia, sobrecarga, sobrescritura y polimorfismo.
 
@@ -634,7 +867,11 @@ Durante la Semana 5 se incorpora `ZonaDeCarga` como recurso compartido, junto co
 
 También se incorpora `EstadoPedido`, permitiendo representar el cambio de cada pedido desde `PENDIENTE` a `EN_REPARTO` y finalmente a `ENTREGADO`.
 
-De esta forma, varios repartidores pueden procesar pedidos concurrentemente manteniendo un acceso controlado al recurso compartido y evitando retiros duplicados.
+Durante la Semana 6 se incorpora una interfaz gráfica mediante Java Swing, permitiendo registrar pedidos, consultar los registros almacenados, iniciar el proceso de entrega y salir de la aplicación mediante una interfaz visual.
+
+La incorporación de `ControladorPedidos` permite compartir los pedidos entre las distintas ventanas, mientras que la organización mediante paquetes separa la ejecución, el modelo y la interfaz gráfica.
+
+De esta forma, SpeedFast evoluciona desde una aplicación ejecutada principalmente por consola hacia una aplicación con interfaz gráfica, manteniendo los conceptos de Programación Orientada a Objetos, concurrencia y sincronización desarrollados durante las semanas anteriores.
 
 ---
 
