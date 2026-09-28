@@ -1,38 +1,29 @@
 package vista;
 
+import dao.PedidoTablaDAO;
 import modelo.ControladorPedidos;
-import modelo.Pedido;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
- * Ventana que muestra los pedidos registrados
- * en el sistema SpeedFast.
- * Utiliza una tabla para visualizar la informacion
- * almacenada en el controlador de pedidos.
+ * Ventana encargada de mostrar los pedidos
+ * almacenados en la base de datos.
  *
  * @author Sergio Sandoval
  */
 public class VentanaListaPedidos extends JFrame {
 
-    private final ControladorPedidos controlador;
-
     private JTable tablaPedidos;
     private DefaultTableModel modeloTabla;
+    private JButton btnRefrescar;
     private JButton btnVolver;
+    private final PedidoTablaDAO pedidoTablaDAO;
 
-    /**
-     * Constructor de la ventana de listado de pedidos.
-     * Recibe el controlador comun utilizado por el sistema
-     * y carga los pedidos registrados en la tabla.
-     *
-     * @param controlador controlador que administra los pedidos registrados
-     */
     public VentanaListaPedidos(ControladorPedidos controlador) {
 
-        this.controlador = controlador;
+        pedidoTablaDAO = new PedidoTablaDAO();
 
         setTitle("SpeedFast - Lista de Pedidos");
         setSize(700, 400);
@@ -42,20 +33,12 @@ public class VentanaListaPedidos extends JFrame {
         String[] columnas = {
                 "ID",
                 "Direccion",
-                "Distancia (km)",
                 "Tipo",
                 "Estado"
         };
 
         modeloTabla = new DefaultTableModel(columnas, 0) {
 
-            /**
-             * Evita que las celdas de la tabla puedan ser editadas.
-             *
-             * @param fila fila seleccionada
-             * @param columna columna seleccionada
-             * @return false para impedir la edicion
-             */
             @Override
             public boolean isCellEditable(int fila, int columna) {
                 return false;
@@ -64,8 +47,10 @@ public class VentanaListaPedidos extends JFrame {
 
         tablaPedidos = new JTable(modeloTabla);
 
-        JScrollPane scrollTabla = new JScrollPane(tablaPedidos);
+        JScrollPane scrollTabla =
+                new JScrollPane(tablaPedidos);
 
+        btnRefrescar = new JButton("Refrescar");
         btnVolver = new JButton("Volver");
 
         JPanel panelBoton = new JPanel();
@@ -74,6 +59,7 @@ public class VentanaListaPedidos extends JFrame {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         );
 
+        panelBoton.add(btnRefrescar);
         panelBoton.add(btnVolver);
 
         setLayout(new BorderLayout());
@@ -81,30 +67,21 @@ public class VentanaListaPedidos extends JFrame {
         add(scrollTabla, BorderLayout.CENTER);
         add(panelBoton, BorderLayout.SOUTH);
 
-        btnVolver.addActionListener(e -> dispose());
+        btnRefrescar.addActionListener(
+                e -> cargarPedidos()
+        );
+
+        btnVolver.addActionListener(
+                e -> dispose()
+        );
 
         cargarPedidos();
     }
 
     /**
-     * Carga en la tabla todos los pedidos almacenados
-     * en el controlador compartido del sistema.
+     * Carga en la tabla los pedidos almacenados en MySQL.
      */
     private void cargarPedidos() {
-
-        modeloTabla.setRowCount(0);
-
-        for (Pedido pedido : controlador.getPedidos()) {
-
-            Object[] fila = {
-                    pedido.getIdPedido(),
-                    pedido.getDireccionEntrega(),
-                    pedido.getDistanciaKm(),
-                    pedido.getClass().getSimpleName(),
-                    pedido.getEstado()
-            };
-
-            modeloTabla.addRow(fila);
-        }
+        pedidoTablaDAO.cargarPedidos(modeloTabla);
     }
 }

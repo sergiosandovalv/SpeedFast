@@ -1,71 +1,56 @@
 package modelo;
 
-/**
- * Clase que representa a un repartidor dentro del sistema SpeedFast.
- * Cada repartidor funciona como una tarea concurrente y obtiene
- * pedidos desde una zona de carga compartida.
- *
- * @author Sergio Sandoval
- */
+import dao.EntregaDAO;
+import dao.PedidoDAO;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class Repartidor implements Runnable {
 
+    private int id;
     private String nombre;
     private ZonaDeCarga zonaDeCarga;
 
-    /**
-     * Constructor de la clase Repartidor.
-     *
-     * @param nombre nombre del repartidor
-     * @param zonaDeCarga zona de carga compartida
-     */
     public Repartidor(String nombre, ZonaDeCarga zonaDeCarga) {
         this.nombre = nombre;
         this.zonaDeCarga = zonaDeCarga;
     }
 
-    /**
-     * Obtiene el nombre del repartidor.
-     *
-     * @return nombre del repartidor
-     */
+    public Repartidor(int id, String nombre) {
+        this.id = id;
+        this.nombre = nombre;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }
 
-    /**
-     * Modifica el nombre del repartidor.
-     *
-     * @param nombre nuevo nombre del repartidor
-     */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    /**
-     * Obtiene la zona de carga utilizada por el repartidor.
-     *
-     * @return zona de carga compartida
-     */
     public ZonaDeCarga getZonaDeCarga() {
         return zonaDeCarga;
     }
 
-    /**
-     * Modifica la zona de carga utilizada por el repartidor.
-     *
-     * @param zonaDeCarga nueva zona de carga
-     */
     public void setZonaDeCarga(ZonaDeCarga zonaDeCarga) {
         this.zonaDeCarga = zonaDeCarga;
     }
 
-    /**
-     * Procesa pedidos obtenidos desde la zona de carga compartida.
-     * Cada pedido cambia su estado a EN_REPARTO, simula el tiempo
-     * de entrega y finalmente cambia su estado a ENTREGADO.
-     */
     @Override
     public void run() {
+
+        PedidoDAO pedidoDAO = new PedidoDAO();
+        EntregaDAO entregaDAO = new EntregaDAO();
 
         System.out.println(
                 "[Repartidor - " + nombre + "] inicia sus entregas."
@@ -80,6 +65,11 @@ public class Repartidor implements Runnable {
             }
 
             pedido.setEstado(EstadoPedido.EN_REPARTO.name());
+
+            pedidoDAO.actualizarEstado(
+                    pedido.getIdPedido(),
+                    EstadoPedido.EN_REPARTO.name()
+            );
 
             System.out.println(
                     "[Repartidor - " + nombre
@@ -114,6 +104,20 @@ public class Repartidor implements Runnable {
             }
 
             pedido.setEstado(EstadoPedido.ENTREGADO.name());
+
+            pedidoDAO.actualizarEstado(
+                    pedido.getIdPedido(),
+                    EstadoPedido.ENTREGADO.name()
+            );
+
+            Entrega entrega = new Entrega(
+                    pedido.getIdPedido(),
+                    id,
+                    LocalDate.now(),
+                    LocalTime.now()
+            );
+
+            entregaDAO.guardar(entrega);
 
             System.out.println(
                     "[Repartidor - " + nombre

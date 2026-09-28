@@ -1,5 +1,6 @@
 package vista;
 
+import dao.RepartidorDAO;
 import modelo.ControladorPedidos;
 import modelo.Pedido;
 import modelo.Repartidor;
@@ -11,28 +12,16 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Ventana principal del sistema SpeedFast.
- * Permite registrar pedidos, listar los pedidos almacenados,
- * iniciar el proceso de entrega y salir de la aplicacion.
- *
- * @author Sergio Sandoval
- */
 public class VentanaPrincipal extends JFrame {
 
     private final ControladorPedidos controlador;
 
     private JButton btnRegistrarPedido;
+    private JButton btnRegistrarRepartidor;
     private JButton btnListarPedidos;
     private JButton btnIniciarEntrega;
     private JButton btnSalir;
 
-    /**
-     * Constructor de la ventana principal.
-     * Configura la ventana y sus componentes graficos.
-     *
-     * @param controlador controlador que administra los pedidos del sistema
-     */
     public VentanaPrincipal(ControladorPedidos controlador) {
 
         this.controlador = controlador;
@@ -43,15 +32,17 @@ public class VentanaPrincipal extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panelPrincipal = new JPanel();
-        panelPrincipal.setLayout(new GridLayout(4, 1, 10, 10));
+        panelPrincipal.setLayout(new GridLayout(5, 1, 10, 10));
 
         btnRegistrarPedido = new JButton("Registrar pedido");
+        btnRegistrarRepartidor = new JButton("Registrar repartidor");
         btnListarPedidos = new JButton("Listar pedidos");
         btnIniciarEntrega =
                 new JButton("Asignar repartidor / Iniciar entrega");
         btnSalir = new JButton("Salir de la aplicacion");
 
         panelPrincipal.add(btnRegistrarPedido);
+        panelPrincipal.add(btnRegistrarRepartidor);
         panelPrincipal.add(btnListarPedidos);
         panelPrincipal.add(btnIniciarEntrega);
         panelPrincipal.add(btnSalir);
@@ -61,27 +52,25 @@ public class VentanaPrincipal extends JFrame {
         btnRegistrarPedido.addActionListener(e -> {
             VentanaRegistroPedido ventanaRegistro =
                     new VentanaRegistroPedido(controlador);
-
             ventanaRegistro.setVisible(true);
+        });
+
+        btnRegistrarRepartidor.addActionListener(e -> {
+            VentanaRegistroRepartidor ventanaRepartidor =
+                    new VentanaRegistroRepartidor();
+            ventanaRepartidor.setVisible(true);
         });
 
         btnListarPedidos.addActionListener(e -> {
             VentanaListaPedidos ventanaLista =
                     new VentanaListaPedidos(controlador);
-
             ventanaLista.setVisible(true);
         });
 
         btnIniciarEntrega.addActionListener(e -> iniciarEntregas());
-
         btnSalir.addActionListener(e -> salirAplicacion());
     }
 
-    /**
-     * Inicia el proceso de entrega de los pedidos pendientes.
-     * Los pedidos son enviados a una zona de carga compartida
-     * y procesados por los repartidores del sistema.
-     */
     private void iniciarEntregas() {
 
         List<Pedido> pedidosPendientes =
@@ -105,21 +94,33 @@ public class VentanaPrincipal extends JFrame {
             zonaDeCarga.agregarPedido(pedido);
         }
 
-        Repartidor repartidor1 =
-                new Repartidor("Daniel", zonaDeCarga);
+        RepartidorDAO repartidorDAO = new RepartidorDAO();
 
-        Repartidor repartidor2 =
-                new Repartidor("Nicole", zonaDeCarga);
+        List<Repartidor> repartidores =
+                repartidorDAO.listarTodos();
 
-        Repartidor repartidor3 =
-                new Repartidor("Jaime", zonaDeCarga);
+        if (repartidores.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No existen repartidores registrados.",
+                    "Sin repartidores",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        for (Repartidor repartidor : repartidores) {
+            repartidor.setZonaDeCarga(zonaDeCarga);
+        }
 
         ExecutorService executor =
-                Executors.newFixedThreadPool(3);
+                Executors.newFixedThreadPool(repartidores.size());
 
-        executor.submit(repartidor1);
-        executor.submit(repartidor2);
-        executor.submit(repartidor3);
+        for (Repartidor repartidor : repartidores) {
+            executor.submit(repartidor);
+        }
 
         executor.shutdown();
 
@@ -131,9 +132,6 @@ public class VentanaPrincipal extends JFrame {
         );
     }
 
-    /**
-     * Solicita confirmacion antes de cerrar la aplicacion.
-     */
     private void salirAplicacion() {
 
         int opcion = JOptionPane.showConfirmDialog(
