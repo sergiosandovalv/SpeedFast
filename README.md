@@ -22,11 +22,13 @@ Durante las primeras semanas, el proyecto integra conceptos de herencia, polimor
 
 Durante la **Semana 4**, el proyecto incorpora concurrencia para simular que varios repartidores realizan entregas durante el mismo período de tiempo.
 
-Durante la **Semana 5**, el sistema incorpora sincronización para controlar el acceso concurrente a una zona de carga compartida. Los repartidores obtienen pedidos desde este recurso común de forma segura, evitando que un mismo pedido sea retirado por más de un repartidor.
+Durante la **Semana 5**, el sistema incorpora sincronización para controlar el acceso concurrente a una zona de carga compartida.
 
 Durante la **Semana 6**, el proyecto incorpora una interfaz gráfica desarrollada con **Java Swing**, permitiendo registrar pedidos, visualizar los pedidos almacenados e iniciar el proceso de entrega desde una ventana principal.
 
-Además, el proyecto se organiza mediante los paquetes `main`, `modelo` y `vista`, separando la ejecución de la aplicación, la lógica del sistema y la interfaz gráfica.
+Durante la **Semana 7**, SpeedFast incorpora persistencia de datos mediante **MySQL y JDBC**, permitiendo almacenar pedidos, consultar repartidores, registrar entregas y visualizar desde Swing la información almacenada en la base de datos.
+
+Además, el proyecto incorpora los paquetes `dao` y `datos`, separando las operaciones JDBC y la conexión a MySQL de las clases del modelo y de la interfaz gráfica.
 
 ---
 
@@ -40,9 +42,13 @@ Mediante las interfaces `Despachable`, `Cancelable` y `Rastreable`, se incorpora
 
 Durante la Semana 4 se incorpora la ejecución concurrente de repartidores mediante `Runnable` y `ExecutorService`.
 
-Durante la Semana 5 se incorpora una `ZonaDeCarga` compartida y sincronizada, permitiendo que varios repartidores retiren y procesen pedidos de forma concurrente sin duplicar su procesamiento.
+Durante la Semana 5 se incorpora una `ZonaDeCarga` compartida y sincronizada.
 
-Durante la Semana 6 se incorpora una interfaz gráfica mediante Java Swing y un `ControladorPedidos` compartido entre las ventanas, permitiendo administrar los pedidos registrados desde la aplicación.
+Durante la Semana 6 se incorpora una interfaz gráfica mediante Java Swing.
+
+Durante la Semana 7 se incorpora una capa de acceso a datos mediante JDBC y clases DAO, permitiendo almacenar y consultar información persistente desde MySQL.
+
+De esta forma, los datos registrados pueden mantenerse almacenados aunque la aplicación sea cerrada y ejecutada nuevamente.
 
 ---
 
@@ -91,6 +97,17 @@ Durante la Semana 6 se incorpora una interfaz gráfica mediante Java Swing y un 
 - Uso de `SwingUtilities.invokeLater()`.
 - Manejo de eventos mediante `ActionListener`.
 - Organización del proyecto mediante paquetes.
+- Persistencia de datos.
+- JDBC.
+- MySQL.
+- Patrón DAO.
+- Uso de `Connection`.
+- Uso de `DriverManager`.
+- Uso de `PreparedStatement`.
+- Uso de `ResultSet`.
+- Manejo de `SQLException`.
+- Cierre de recursos mediante `try-with-resources`.
+- Variables de entorno para información sensible.
 - Control de versiones mediante Git.
 - Publicación del proyecto en GitHub.
 
@@ -103,8 +120,18 @@ SpeedFast/
 │
 ├── .gitignore
 ├── README.md
+├── SpeedFast_Semana7.sql
 │
 └── src/
+    │
+    ├── dao/
+    │   ├── EntregaDAO.java
+    │   ├── PedidoDAO.java
+    │   ├── PedidoTablaDAO.java
+    │   └── RepartidorDAO.java
+    │
+    ├── datos/
+    │   └── ConexionBD.java
     │
     ├── main/
     │   └── Main.java
@@ -113,6 +140,7 @@ SpeedFast/
     │   ├── Cancelable.java
     │   ├── ControladorPedidos.java
     │   ├── Despachable.java
+    │   ├── Entrega.java
     │   ├── EstadoPedido.java
     │   ├── Pedido.java
     │   ├── PedidoComida.java
@@ -125,14 +153,32 @@ SpeedFast/
     └── vista/
         ├── VentanaListaPedidos.java
         ├── VentanaPrincipal.java
-        └── VentanaRegistroPedido.java
+        ├── VentanaRegistroPedido.java
+        └── VentanaRegistroRepartidor.java
 ```
 
 ---
 
 # 📦 Organización mediante paquetes
 
-Durante la Semana 6 el proyecto se organiza en tres paquetes principales.
+Durante la Semana 7 el proyecto se organiza en cinco paquetes principales.
+
+### `dao`
+
+Contiene las clases encargadas de realizar las operaciones JDBC sobre la base de datos:
+
+- `PedidoDAO`.
+- `PedidoTablaDAO`.
+- `RepartidorDAO`.
+- `EntregaDAO`.
+
+### `datos`
+
+Contiene la clase:
+
+- `ConexionBD`.
+
+Esta clase centraliza la conexión entre la aplicación SpeedFast y MySQL.
 
 ### `main`
 
@@ -148,6 +194,7 @@ Contiene las clases relacionadas con la lógica y los datos del sistema:
 - `PedidoExpress`.
 - `ControladorPedidos`.
 - `Repartidor`.
+- `Entrega`.
 - `ZonaDeCarga`.
 - `EstadoPedido`.
 - `Despachable`.
@@ -160,62 +207,42 @@ Contiene las clases relacionadas con la interfaz gráfica:
 
 - `VentanaPrincipal`.
 - `VentanaRegistroPedido`.
+- `VentanaRegistroRepartidor`.
 - `VentanaListaPedidos`.
 
-Esta organización permite separar las responsabilidades del sistema y mantener una estructura más ordenada.
+Esta organización permite separar las responsabilidades del sistema entre modelo, interfaz gráfica, conexión y acceso a datos.
 
 ---
 
-# 📊 Diagrama general de clases
-
-El siguiente diagrama representa de forma simplificada la estructura principal del sistema.
+# 📊 Diagrama general del proyecto
 
 ```text
-                              Pedido
-                           <<abstracta>>
-                                │
-              ┌─────────────────┼─────────────────┐
-              │                 │                 │
-              ▼                 ▼                 ▼
-        PedidoComida     PedidoEncomienda    PedidoExpress
-              │                 │                 │
-              └─────────────────┼─────────────────┘
-                                │
-                       implementan interfaces
-                                │
-              ┌─────────────────┼─────────────────┐
-              │                 │                 │
-              ▼                 ▼                 ▼
-        Despachable         Cancelable        Rastreable
-        <<interface>>       <<interface>>      <<interface>>
-
-
-                          EstadoPedido
-                             <<enum>>
-                                │
-                 PENDIENTE - EN_REPARTO - ENTREGADO
-
-
-                          ZonaDeCarga
-                                │
-                         List<Pedido>
-                                │
-                         synchronized
-                                │
-                                ▼
-                           Repartidor
-                                │
-                      implements Runnable
-
-
-                       ControladorPedidos
-                                │
-                         List<Pedido>
-                                │
-             ┌──────────────────┼──────────────────┐
-             │                  │                  │
-             ▼                  ▼                  ▼
-     VentanaPrincipal   VentanaRegistroPedido  VentanaListaPedidos
+                           SpeedFast
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+          ▼                    ▼                    ▼
+        vista                modelo                dao
+          │                    │                    │
+          │                  Pedido             PedidoDAO
+          │              <<abstracta>>       RepartidorDAO
+          │                    │              EntregaDAO
+          │        ┌───────────┼───────────┐  PedidoTablaDAO
+          │        │           │           │       │
+          │        ▼           ▼           ▼       │
+          │   PedidoComida  PedidoEncomienda       │
+          │                            PedidoExpress│
+          │                                         │
+          │                                         ▼
+          │                                    ConexionBD
+          │                                         │
+          └─────────────────────────────────────────┤
+                                                    ▼
+                                                  MySQL
+                                                    │
+                                    ┌───────────────┼───────────────┐
+                                    ▼               ▼               ▼
+                                 pedido         repartidor        entrega
 ```
 
 ---
@@ -230,70 +257,7 @@ public abstract class Pedido
 
 Esto permite utilizarla como base de la jerarquía sin crear objetos `Pedido` directamente.
 
-Además, define el método abstracto:
-
-```java
-public abstract int calcularTiempoEntrega();
-```
-
-Cada subclase implementa este método de acuerdo con sus propias reglas para calcular el tiempo estimado de entrega.
-
----
-
-# ⏱️ Cálculo de tiempos de entrega
-
-Cada tipo de pedido implementa un comportamiento diferente.
-
-### PedidoComida
-
-Calcula **15 minutos base más 2 minutos por kilómetro**.
-
-```text
-15 + (2 × distancia)
-```
-
-### PedidoEncomienda
-
-Calcula **20 minutos base más 1.5 minutos por kilómetro**, ajustando el resultado a minutos enteros.
-
-```text
-20 + (1.5 × distancia)
-```
-
-### PedidoExpress
-
-Considera **10 minutos base** y agrega **5 minutos adicionales** cuando la distancia supera los 5 kilómetros.
-
-```text
-10 minutos
-+ 5 minutos si distancia > 5 km
-```
-
----
-
-# 🔄 Sobrecarga y sobrescritura
-
-El sistema utiliza sobrecarga mediante dos versiones del método `asignarRepartidor()`:
-
-```java
-asignarRepartidor()
-```
-
-y:
-
-```java
-asignarRepartidor(String nombreRepartidor)
-```
-
-La primera versión permite representar una asignación automática, mientras que la segunda permite indicar manualmente el nombre del repartidor.
-
-Las subclases sobrescriben estos comportamientos mediante `@Override` para aplicar reglas específicas según el tipo de pedido.
-
-Por ejemplo:
-
-- `PedidoComida` verifica una mochila térmica.
-- `PedidoEncomienda` verifica peso y embalaje.
-- `PedidoExpress` busca disponibilidad inmediata.
+Cada subclase mantiene los comportamientos específicos correspondientes a su tipo.
 
 ---
 
@@ -301,114 +265,59 @@ Por ejemplo:
 
 Los diferentes tipos de pedidos pueden ser administrados mediante referencias de tipo `Pedido`.
 
-Por ejemplo:
+Las clases:
 
-```java
-Pedido pedido;
-
-pedido = new PedidoComida(...);
-pedido = new PedidoEncomienda(...);
-pedido = new PedidoExpress(...);
+```text
+PedidoComida
+PedidoEncomienda
+PedidoExpress
 ```
 
-Aunque la referencia es de tipo `Pedido`, cada objeto mantiene el comportamiento correspondiente a su clase real.
-
-Esto permite utilizar una estructura común y mantener comportamientos diferentes para cada tipo de pedido.
+heredan desde `Pedido` y mantienen comportamientos específicos según el tipo de objeto creado.
 
 ---
 
 # 🔌 Interfaces
 
-El sistema incorpora tres interfaces para representar diferentes capacidades de los pedidos.
+El sistema mantiene las interfaces:
 
-### Despachable
+### `Despachable`
 
-Define la capacidad de despachar un pedido:
+Define la capacidad de despachar un pedido.
 
-```java
-void despachar();
-```
+### `Cancelable`
 
-### Cancelable
+Define la capacidad de cancelar un pedido.
 
-Define la capacidad de cancelar un pedido:
+### `Rastreable`
 
-```java
-void cancelar();
-```
+Define la capacidad de consultar el historial de un pedido.
 
-### Rastreable
-
-Define la capacidad de consultar el historial de un pedido:
-
-```java
-void verHistorial();
-```
-
-Las clases concretas implementan estas interfaces según las capacidades definidas en el sistema.
-
-De esta manera, la jerarquía representa qué tipo de objeto es cada pedido, mientras que las interfaces representan las capacidades que puede realizar.
-
----
-
-# 📋 Historial de pedidos
-
-Cada pedido mantiene un historial mediante un `ArrayList<String>`.
-
-Cuando se realizan acciones sobre un pedido, estas pueden registrarse en su historial.
-
-Entre los eventos definidos en el sistema se encuentran:
-
-- Creación del pedido.
-- Asignación de repartidor.
-- Despacho del pedido.
-- Cancelación del pedido.
-
-Mediante el método:
-
-```java
-verHistorial()
-```
-
-es posible visualizar los eventos registrados para cada pedido.
+Las interfaces permiten mantener separadas las capacidades de los pedidos de la estructura principal de herencia.
 
 ---
 
 # 🧵 Concurrencia – Semana 4
 
-Durante la Semana 4 se incorporó la clase `Repartidor` como una tarea concurrente mediante:
+La clase `Repartidor` funciona como una tarea concurrente mediante:
 
 ```java
 public class Repartidor implements Runnable
 ```
 
-La ejecución de los repartidores es administrada mediante un `ExecutorService`, permitiendo que varias tareas avancen concurrentemente.
+La ejecución de los repartidores se administra mediante `ExecutorService`.
 
-Este concepto continúa siendo utilizado en las semanas siguientes.
+Esto permite que diferentes repartidores procesen pedidos concurrentemente.
 
 ---
 
 # 🔒 Sincronización – Semana 5
 
-Durante la Semana 5 se incorpora la clase `ZonaDeCarga` como recurso compartido entre los repartidores.
+La clase `ZonaDeCarga` representa el recurso compartido entre los repartidores.
 
-La clase mantiene una lista de pedidos.
+El acceso a los pedidos se controla mediante métodos sincronizados.
 
-El acceso a esta lista se controla mediante métodos sincronizados:
-
-```java
-public synchronized void agregarPedido(Pedido pedido)
-```
-
-y:
-
-```java
-public synchronized Pedido retirarPedido()
-```
-
-La sincronización permite que solamente un repartidor a la vez ejecute la operación crítica de retirar un pedido.
-
-De esta forma se evita que dos repartidores retiren el mismo pedido desde la zona de carga.
+La sincronización evita que dos repartidores retiren el mismo pedido desde la zona de carga.
 
 ---
 
@@ -417,10 +326,10 @@ De esta forma se evita que dos repartidores retiren el mismo pedido desde la zon
 El sistema incorpora el enum:
 
 ```java
-public enum EstadoPedido
+EstadoPedido
 ```
 
-con tres estados:
+con los estados:
 
 ```text
 PENDIENTE
@@ -428,143 +337,57 @@ EN_REPARTO
 ENTREGADO
 ```
 
-Todos los pedidos comienzan con estado:
+Cuando se registra un pedido comienza en:
 
 ```text
 PENDIENTE
 ```
 
-Cuando un repartidor retira un pedido:
+Durante la entrega:
 
 ```text
-PENDIENTE -> EN_REPARTO
+PENDIENTE
+    ↓
+EN_REPARTO
+    ↓
+ENTREGADO
 ```
 
-Después de completar la entrega:
-
-```text
-EN_REPARTO -> ENTREGADO
-```
-
-Esto permite representar el avance del pedido durante el proceso de entrega.
+Durante la Semana 7 estos cambios también pueden actualizarse en la base de datos.
 
 ---
 
-# ⏳ Simulación de entregas
+# 🖥️ Interfaz gráfica – Semana 6 y Semana 7
 
-Cada repartidor obtiene un pedido desde `ZonaDeCarga` y cambia su estado a `EN_REPARTO`.
+La interfaz gráfica se encuentra desarrollada mediante Java Swing.
 
-Para representar el tiempo de entrega se utiliza:
-
-```java
-Thread.sleep(1000);
-```
-
-Después de la pausa, el pedido cambia su estado a `ENTREGADO`.
-
-También se maneja `InterruptedException` para controlar una posible interrupción del hilo durante la simulación.
-
----
-
-# ⚙️ ExecutorService
-
-La ejecución concurrente se administra mediante `ExecutorService`.
-
-El sistema utiliza un pool de tres hilos:
-
-```java
-ExecutorService executor =
-        Executors.newFixedThreadPool(3);
-```
-
-Los repartidores son enviados al executor mediante:
-
-```java
-executor.submit(repartidor1);
-executor.submit(repartidor2);
-executor.submit(repartidor3);
-```
-
-Después de enviar las tareas se solicita el cierre:
-
-```java
-executor.shutdown();
-```
-
-De esta forma los repartidores pueden procesar los pedidos concurrentemente.
-
----
-
-# 🚚 Repartidores y zona de carga
-
-La simulación utiliza tres repartidores:
-
-```text
-Daniel
-Nicole
-Jaime
-```
-
-Los tres reciben la misma instancia de `ZonaDeCarga`.
-
-Los pedidos pendientes son agregados al recurso compartido cuando el usuario selecciona la opción para iniciar las entregas.
-
-Los pedidos no están asignados previamente a un repartidor específico.
-
-Cada repartidor solicita el siguiente pedido disponible a `ZonaDeCarga`.
-
-Por este motivo, la distribución de los pedidos entre Daniel, Nicole y Jaime puede cambiar entre ejecuciones.
-
----
-
-# 🖥️ Interfaz gráfica – Semana 6
-
-Durante la Semana 6 se incorpora una interfaz gráfica desarrollada mediante **Java Swing**.
-
-La interfaz permite utilizar las principales funciones del sistema mediante ventanas y botones, sin depender exclusivamente de la interacción por consola.
-
-La ventana principal contiene las siguientes opciones:
+La ventana principal permite acceder a las principales funcionalidades:
 
 ```text
 Registrar pedido
+Registrar repartidor
 Listar pedidos
 Asignar repartidor / Iniciar entrega
 Salir de la aplicacion
 ```
 
-La interfaz gráfica mantiene la lógica desarrollada durante las semanas anteriores y permite acceder a ella de una forma más organizada.
-
----
-
-# 🏠 Ventana principal
-
-La clase `VentanaPrincipal` representa el menú principal de SpeedFast.
-
-Desde esta ventana el usuario puede:
-
-- Abrir el formulario de registro.
-- Consultar los pedidos almacenados.
-- Iniciar el proceso de entrega.
-- Salir de la aplicación.
-
-La ventana utiliza botones de Swing y eventos para ejecutar cada una de estas acciones.
+Durante la Semana 7 la interfaz se integra con MySQL para registrar y consultar información persistente.
 
 ---
 
 # 📝 Registro de pedidos
 
-La clase `VentanaRegistroPedido` permite ingresar los datos necesarios para crear un nuevo pedido.
+`VentanaRegistroPedido` permite crear nuevos pedidos desde la interfaz gráfica.
 
-El formulario solicita:
+El usuario ingresa:
 
 ```text
-ID
 Direccion
 Distancia (km)
 Tipo
 ```
 
-El tipo de pedido se selecciona mediante un `JComboBox`:
+El tipo puede ser:
 
 ```text
 Comida
@@ -572,7 +395,7 @@ Encomienda
 Express
 ```
 
-Dependiendo de la selección realizada se crea una instancia de:
+Dependiendo de la selección se crea una instancia de:
 
 ```text
 PedidoComida
@@ -580,61 +403,146 @@ PedidoEncomienda
 PedidoExpress
 ```
 
-El formulario también valida que los campos estén completos, que el ID sea un número entero y que la distancia ingresada sea válida y mayor que cero.
+El sistema valida los datos ingresados.
 
-Cuando el pedido se registra correctamente, el sistema muestra un mensaje mediante `JOptionPane`.
+Al guardar el pedido, `PedidoDAO` realiza la operación correspondiente sobre MySQL.
 
-La ventana incorpora además un botón **Volver**, que permite cerrarla y regresar a la ventana principal.
+El identificador del pedido es generado por la base de datos mediante `AUTO_INCREMENT`.
+
+---
+
+# 👤 Registro de repartidores
+
+Durante la Semana 7 se incorpora `VentanaRegistroRepartidor`.
+
+Esta ventana permite registrar nuevos repartidores desde la interfaz gráfica.
+
+Los repartidores quedan almacenados en la tabla:
+
+```text
+repartidor
+```
+
+de MySQL.
 
 ---
 
 # 📋 Lista de pedidos
 
-La clase `VentanaListaPedidos` permite visualizar los pedidos registrados mediante un `JTable`.
+`VentanaListaPedidos` permite visualizar los pedidos registrados mediante un `JTable`.
 
-La tabla contiene las columnas:
+La tabla contiene:
 
 ```text
 ID
 Direccion
-Distancia (km)
 Tipo
 Estado
 ```
 
-La información mostrada proviene del `ControladorPedidos` compartido por las ventanas.
+Durante la Semana 7 los datos mostrados son consultados desde MySQL mediante `PedidoTablaDAO`.
 
-La tabla se utiliza solamente para visualizar información, por lo que sus celdas no pueden ser modificadas directamente por el usuario.
-
-Esto permite proteger los datos mostrados y evita modificaciones accidentales desde la tabla.
-
-La ventana también incorpora un botón **Volver** para regresar al menú principal.
-
----
-
-# 🎮 Controlador de pedidos
-
-La clase `ControladorPedidos` administra los pedidos utilizados por la aplicación.
-
-El mismo controlador es compartido entre las distintas ventanas.
-
-De esta manera, cuando un pedido es registrado desde `VentanaRegistroPedido`, posteriormente puede ser consultado desde `VentanaListaPedidos` y procesado desde `VentanaPrincipal`.
-
-El controlador permite mantener centralizada la colección de pedidos y separar su administración de la interfaz gráfica.
-
----
-
-# 🚚 Inicio del proceso de entrega
-
-Desde `VentanaPrincipal`, el usuario puede seleccionar:
+La ventana incorpora la opción:
 
 ```text
-Asignar repartidor / Iniciar entrega
+Refrescar
 ```
 
-El sistema obtiene los pedidos que se encuentran pendientes y los agrega a una instancia compartida de `ZonaDeCarga`.
+que permite volver a consultar la información almacenada en la base de datos.
 
-Luego se crean tres repartidores:
+La tabla es utilizada solamente para visualizar información y sus celdas no pueden ser modificadas directamente por el usuario.
+
+---
+
+# 🗄️ Base de datos – Semana 7
+
+SpeedFast utiliza una base de datos MySQL denominada:
+
+```text
+speedfast_db
+```
+
+La base contiene tres tablas principales:
+
+```text
+repartidor
+pedido
+entrega
+```
+
+---
+
+## Tabla `repartidor`
+
+Almacena los repartidores disponibles en SpeedFast.
+
+```text
+id
+nombre
+```
+
+El campo `id` corresponde a la clave primaria y utiliza `AUTO_INCREMENT`.
+
+---
+
+## Tabla `pedido`
+
+Almacena los pedidos registrados desde la aplicación.
+
+```text
+id
+direccion
+tipo
+estado
+```
+
+El campo `id` corresponde a la clave primaria y utiliza `AUTO_INCREMENT`.
+
+---
+
+## Tabla `entrega`
+
+Registra la relación entre un pedido y el repartidor que realiza la entrega.
+
+```text
+id
+id_pedido
+id_repartidor
+fecha
+hora
+```
+
+La tabla contiene claves foráneas hacia:
+
+```text
+pedido(id)
+repartidor(id)
+```
+
+Esto permite mantener relacionadas las entregas con los pedidos y repartidores correspondientes.
+
+---
+
+# 📄 Script SQL
+
+El proyecto incluye:
+
+```text
+SpeedFast_Semana7.sql
+```
+
+Este archivo contiene el DDL necesario para disponer de la estructura utilizada por SpeedFast.
+
+El script permite crear:
+
+```text
+speedfast_db
+repartidor
+pedido
+entrega
+```
+
+También incorpora los repartidores iniciales:
 
 ```text
 Daniel
@@ -642,9 +550,171 @@ Nicole
 Jaime
 ```
 
-Los repartidores son ejecutados mediante un `ExecutorService` con tres hilos.
+y consultas de verificación sobre las tablas.
 
-Cada repartidor obtiene pedidos desde la zona de carga compartida y cambia sus estados durante el proceso:
+---
+
+# 🔌 Conexión JDBC
+
+La clase:
+
+```text
+ConexionBD
+```
+
+ubicada en el paquete:
+
+```text
+datos
+```
+
+es responsable de establecer la conexión entre Java y MySQL.
+
+La conexión utiliza:
+
+```java
+DriverManager.getConnection(...)
+```
+
+La URL configurada corresponde a:
+
+```text
+jdbc:mysql://localhost:3306/speedfast_db
+```
+
+El usuario configurado para la conexión es:
+
+```text
+root
+```
+
+La contraseña no se encuentra almacenada directamente en el código fuente.
+
+---
+
+# 🔐 Variable de entorno
+
+La contraseña utilizada por MySQL se obtiene mediante la variable de entorno:
+
+```text
+MYSQL_PASSWORD
+```
+
+En Java se obtiene mediante:
+
+```java
+System.getenv("MYSQL_PASSWORD")
+```
+
+Esto permite mantener la contraseña fuera del código fuente y evita publicarla en GitHub.
+
+Cada equipo que ejecute SpeedFast debe configurar localmente esta variable con la contraseña correspondiente a su instalación de MySQL.
+
+Ejemplo:
+
+```text
+MYSQL_PASSWORD=<contraseña local de MySQL>
+```
+
+No se debe reemplazar este ejemplo por una contraseña real dentro del repositorio.
+
+---
+
+# 💾 Acceso a datos mediante DAO
+
+Durante la Semana 7 se incorpora una capa DAO para separar las operaciones JDBC del resto de la aplicación.
+
+---
+
+## `PedidoDAO`
+
+Permite realizar operaciones relacionadas con los pedidos.
+
+Entre ellas:
+
+```text
+Guardar pedidos.
+Actualizar estados.
+Consultar pedidos pendientes.
+```
+
+Los pedidos nuevos utilizan el ID generado automáticamente por MySQL.
+
+---
+
+## `RepartidorDAO`
+
+Permite realizar operaciones relacionadas con los repartidores.
+
+Entre ellas:
+
+```text
+Registrar repartidores.
+Consultar repartidores almacenados.
+```
+
+---
+
+## `EntregaDAO`
+
+Permite registrar una entrega en MySQL.
+
+La entrega relaciona:
+
+```text
+Pedido
+Repartidor
+Fecha
+Hora
+```
+
+---
+
+## `PedidoTablaDAO`
+
+Permite consultar los pedidos almacenados en MySQL y cargar la información utilizada por el `JTable`.
+
+De esta manera, la tabla de la interfaz gráfica consulta información persistente en lugar de depender solamente de los datos almacenados en memoria.
+
+---
+
+# 🔒 Manejo de recursos JDBC
+
+Las operaciones de acceso a datos utilizan:
+
+```java
+try-with-resources
+```
+
+para administrar recursos JDBC como:
+
+```text
+Connection
+PreparedStatement
+ResultSet
+```
+
+También se utiliza manejo de:
+
+```java
+SQLException
+```
+
+para controlar posibles errores durante las operaciones con la base de datos.
+
+---
+
+# 🚚 Proceso de entrega
+
+Desde `VentanaPrincipal`, el usuario puede seleccionar:
+
+```text
+Asignar repartidor / Iniciar entrega
+```
+
+Los pedidos pendientes son procesados mediante la lógica de `ZonaDeCarga` y `Repartidor`.
+
+Durante el proceso el estado cambia:
 
 ```text
 PENDIENTE
@@ -654,56 +724,33 @@ EN_REPARTO
 ENTREGADO
 ```
 
-Gracias a la sincronización de `ZonaDeCarga`, cada pedido es retirado de forma segura y no puede ser procesado simultáneamente por dos repartidores.
+Los cambios de estado se actualizan también en MySQL.
+
+Al finalizar una entrega, se registra la información correspondiente mediante `EntregaDAO`.
 
 ---
 
-# 🚪 Salida de la aplicación
+# 💾 Persistencia
 
-La ventana principal incorpora la opción:
+Una de las principales incorporaciones de la Semana 7 es la persistencia.
 
-```text
-Salir de la aplicacion
-```
+Los registros almacenados en MySQL permanecen disponibles aunque SpeedFast sea cerrado.
 
-Al seleccionar esta opción se muestra un cuadro de confirmación mediante `JOptionPane`.
-
-El usuario puede seleccionar:
+Por este motivo es posible:
 
 ```text
-Yes
-No
+Ejecutar SpeedFast
+        ↓
+Registrar información
+        ↓
+Cerrar SpeedFast
+        ↓
+Ejecutar nuevamente
+        ↓
+Consultar información almacenada
 ```
 
-Si selecciona **Yes**, la aplicación finaliza.
-
-Si selecciona **No**, la aplicación continúa funcionando normalmente.
-
-Esto evita cerrar el programa accidentalmente.
-
----
-
-# ▶️ Inicio de la interfaz gráfica
-
-La aplicación se inicia desde la clase `Main`.
-
-La creación de la interfaz gráfica se realiza mediante:
-
-```java
-SwingUtilities.invokeLater(() -> {
-    ControladorPedidos controlador =
-            new ControladorPedidos();
-
-    VentanaPrincipal ventana =
-            new VentanaPrincipal(controlador);
-
-    ventana.setVisible(true);
-});
-```
-
-`SwingUtilities.invokeLater()` permite iniciar la interfaz gráfica utilizando el hilo de eventos de Swing.
-
-Además, se crea una única instancia de `ControladorPedidos`, que posteriormente es compartida con las ventanas del sistema.
+La persistencia permite que el `JTable` vuelva a consultar los pedidos registrados anteriormente desde MySQL.
 
 ---
 
@@ -711,6 +758,10 @@ Además, se crea una única instancia de `ControladorPedidos`, que posteriorment
 
 - Java JDK 26.
 - Java Swing.
+- JDBC.
+- MySQL Community Server.
+- MySQL Connector/J.
+- MySQL Workbench.
 - IntelliJ IDEA.
 - Git.
 - GitHub.
@@ -718,65 +769,123 @@ Además, se crea una única instancia de `ControladorPedidos`, que posteriorment
 
 ---
 
-# 🚀 Ejecución
+# ⚙️ Preparación de la base de datos
 
-1. Abrir el proyecto `SpeedFast` en IntelliJ IDEA.
-2. Ejecutar la clase `Main.java` del paquete `main`.
-3. Se abre la ventana principal de SpeedFast.
-4. Seleccionar **Registrar pedido**.
-5. Ingresar ID, dirección, distancia y tipo de pedido.
-6. Presionar **Guardar**.
-7. Regresar al menú mediante **Volver**.
-8. Seleccionar **Listar pedidos** para consultar los registros.
-9. Verificar que el pedido se encuentre inicialmente en estado `PENDIENTE`.
-10. Regresar mediante **Volver**.
-11. Seleccionar **Asignar repartidor / Iniciar entrega**.
-12. Los pedidos pendientes son enviados a `ZonaDeCarga`.
-13. Los repartidores procesan los pedidos concurrentemente.
-14. Los pedidos cambian de `PENDIENTE` a `EN_REPARTO`.
-15. Al finalizar la entrega cambian a `ENTREGADO`.
-16. Consultar nuevamente la lista para verificar el estado.
-17. Utilizar **Salir de la aplicacion** para finalizar SpeedFast.
+Antes de ejecutar SpeedFast se debe preparar MySQL.
+
+### Paso 1
+
+Iniciar el servidor MySQL.
+
+### Paso 2
+
+Abrir el archivo:
+
+```text
+SpeedFast_Semana7.sql
+```
+
+mediante MySQL Workbench.
+
+### Paso 3
+
+Ejecutar el script SQL.
+
+### Paso 4
+
+Verificar la existencia de la base:
+
+```text
+speedfast_db
+```
+
+### Paso 5
+
+Verificar las tablas:
+
+```text
+repartidor
+pedido
+entrega
+```
 
 ---
 
-# 🖥️ Ejemplo del proceso
+# 🔧 MySQL Connector/J
 
-Al registrar un pedido desde la interfaz gráfica:
+SpeedFast utiliza **MySQL Connector/J** para establecer la conexión JDBC.
 
-```text
-ID: 125
-Direccion: dos sur
-Distancia: 17.0
-Tipo: Encomienda
-```
+El controlador debe encontrarse disponible para el proyecto antes de ejecutar la aplicación.
 
-El pedido queda inicialmente registrado como:
+El proyecto fue desarrollado utilizando:
 
 ```text
-ID     Direccion     Distancia     Tipo                Estado
-125    dos sur       17.0          PedidoEncomienda    PENDIENTE
+mysql-connector-j-26.7.0.jar
 ```
 
-Después de iniciar el proceso de entrega, la consola puede mostrar:
+Una vez disponible el controlador JDBC, IntelliJ puede utilizarlo como biblioteca del proyecto para realizar la conexión con MySQL.
+
+---
+
+# ⚙️ Configuración en IntelliJ IDEA
+
+Antes de ejecutar SpeedFast:
+
+1. Abrir el proyecto en IntelliJ IDEA.
+2. Verificar que se encuentre configurado Java JDK 26.
+3. Verificar que MySQL Connector/J se encuentre disponible.
+4. Ejecutar `SpeedFast_Semana7.sql` en MySQL.
+5. Configurar la variable de entorno `MYSQL_PASSWORD`.
+6. Ejecutar `Main.java`.
+
+La variable se configura localmente en la configuración de ejecución.
+
+Ejemplo:
 
 ```text
-[Repartidor - Nicole] Retirando pedido #125
-[Repartidor - Nicole] Estado: EN_REPARTO
-[Repartidor - Nicole] Entregando pedido #125
-[Repartidor - Nicole] Pedido #125 entregado.
-[Repartidor - Nicole] Estado: ENTREGADO
-[Repartidor - Nicole] termino sus entregas.
+MYSQL_PASSWORD=<contraseña local de MySQL>
 ```
 
-Al consultar nuevamente la lista de pedidos:
+La contraseña real no debe incorporarse al código fuente ni al repositorio.
 
-```text
-ID     Direccion     Distancia     Tipo                Estado
-125    dos sur       17.0          PedidoEncomienda    ENTREGADO
+---
+
+# ▶️ Ejecución y prueba
+
+Una vez configurado el proyecto:
+
+1. Ejecutar `Main.java` del paquete `main`.
+2. Verificar que se abra la ventana principal.
+3. Seleccionar **Registrar pedido**.
+4. Ingresar dirección, distancia y tipo.
+5. Guardar el pedido.
+6. Seleccionar **Listar pedidos**.
+7. Verificar que el pedido aparezca en estado `PENDIENTE`.
+8. Regresar al menú principal.
+9. Seleccionar **Asignar repartidor / Iniciar entrega**.
+10. Esperar el procesamiento.
+11. Abrir nuevamente **Listar pedidos**.
+12. Presionar **Refrescar**.
+13. Verificar el cambio de estado.
+14. Consultar las tablas de MySQL para verificar la información persistente.
+15. Cerrar SpeedFast.
+16. Ejecutar nuevamente la aplicación.
+17. Abrir **Listar pedidos**.
+18. Verificar que los registros almacenados continúen disponibles.
+
+---
+
+# 🔍 Verificación desde MySQL
+
+Los registros pueden comprobarse mediante:
+
+```sql
+SELECT * FROM repartidor;
+SELECT * FROM pedido;
+SELECT * FROM entrega;
 ```
 
-> El repartidor que procesa cada pedido puede cambiar entre ejecuciones debido al procesamiento concurrente.
+Esto permite comparar la información registrada desde la interfaz gráfica con los datos almacenados realmente en MySQL.
 
 ---
 
@@ -784,94 +893,105 @@ ID     Direccion     Distancia     Tipo                Estado
 
 - Clase abstracta `Pedido`.
 - Creación de pedidos de comida, encomienda y express.
-- Encapsulamiento de atributos comunes.
-- Herencia desde la clase `Pedido`.
+- Encapsulamiento.
+- Herencia.
 - Métodos abstractos y concretos.
-- Cálculo de tiempos según el tipo de pedido.
-- Sobrecarga de métodos.
+- Polimorfismo.
+- Sobrecarga.
 - Sobrescritura mediante `@Override`.
-- Polimorfismo mediante referencias de tipo `Pedido`.
 - Interfaces `Despachable`, `Cancelable` y `Rastreable`.
-- Implementación de múltiples interfaces.
-- Registro de eventos mediante `ArrayList`.
-- Visualización del historial.
+- Historial mediante `ArrayList`.
 - Clase `Repartidor`.
 - Implementación de `Runnable`.
 - Clase `EstadoPedido`.
 - Estados `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
 - Clase `ZonaDeCarga`.
-- Lista de pedidos compartida.
-- Métodos sincronizados mediante `synchronized`.
-- Retiro seguro de pedidos.
-- Prevención del procesamiento duplicado.
-- Simulación de entregas mediante `Thread.sleep()`.
-- Manejo de `InterruptedException`.
+- Sincronización mediante `synchronized`.
 - Ejecución concurrente mediante `ExecutorService`.
-- Pool de tres hilos mediante `newFixedThreadPool(3)`.
-- Envío de tareas mediante `submit()`.
-- Cierre del executor mediante `shutdown()`.
-- Tres repartidores compartiendo la misma zona de carga.
-- Organización mediante paquetes `main`, `modelo` y `vista`.
-- Clase `ControladorPedidos`.
-- Controlador compartido entre las ventanas.
 - Interfaz gráfica mediante Java Swing.
-- Ventana principal del sistema.
-- Formulario para registrar pedidos.
-- Validación de datos ingresados.
-- Selección del tipo de pedido mediante `JComboBox`.
-- Visualización de pedidos mediante `JTable`.
-- Tabla de pedidos no editable.
-- Visualización del estado de cada pedido.
-- Botones para volver al menú principal.
-- Inicio de entregas desde la interfaz gráfica.
-- Confirmación para salir de la aplicación.
-- Uso de `SwingUtilities.invokeLater()`.
+- Ventana principal.
+- Registro de pedidos.
+- Registro de repartidores.
+- Validación de datos.
+- Visualización mediante `JTable`.
+- Tabla no editable.
+- Botón Refrescar.
+- Persistencia mediante MySQL.
+- Conexión mediante JDBC.
+- Clase `ConexionBD`.
+- Patrón DAO.
+- `PedidoDAO`.
+- `RepartidorDAO`.
+- `EntregaDAO`.
+- `PedidoTablaDAO`.
+- Uso de `PreparedStatement`.
+- Uso de `ResultSet`.
+- Manejo de `SQLException`.
+- Cierre de recursos mediante `try-with-resources`.
+- Inserción de pedidos en MySQL.
+- Consulta de repartidores.
+- Actualización de estados.
+- Registro de entregas.
+- Consulta de pedidos desde MySQL.
+- Persistencia después de reiniciar la aplicación.
+- Variable de entorno `MYSQL_PASSWORD`.
 - Documentación mediante Javadoc.
-- Control de versiones mediante Git y GitHub.
+- Control de versiones mediante Git.
+- Publicación mediante GitHub.
 
 ---
 
 # 📈 Reutilización y mantenibilidad
 
-La clase abstracta `Pedido` centraliza los atributos y comportamientos comunes, evitando repetir código en las subclases.
+La clase abstracta `Pedido` mantiene los atributos y comportamientos comunes de la jerarquía.
 
-Cada subclase contiene las reglas específicas correspondientes a su tipo de pedido.
+Las subclases especializan las reglas correspondientes a cada tipo de pedido.
 
-Las interfaces permiten separar capacidades como despacho, cancelación y rastreo de la jerarquía principal.
+Las interfaces permiten separar las capacidades de los pedidos.
 
-La clase `Repartidor` representa la tarea concurrente mediante `Runnable`, mientras que `ExecutorService` administra su ejecución.
+`Repartidor` representa las tareas concurrentes y `ZonaDeCarga` administra el recurso compartido.
 
-`ZonaDeCarga` separa la administración del recurso compartido de la lógica del repartidor.
+La interfaz gráfica se mantiene separada en el paquete `vista`.
 
-La sincronización se concentra en las operaciones que acceden a la lista compartida, evitando que un mismo pedido sea retirado por más de un repartidor.
+Durante la Semana 7, las operaciones SQL se separan mediante el paquete `dao`.
 
-Durante la Semana 6, `ControladorPedidos` centraliza la administración de los pedidos utilizados por la interfaz gráfica.
+La conexión se centraliza mediante `ConexionBD` en el paquete `datos`.
 
-La separación mediante los paquetes `main`, `modelo` y `vista` permite mantener organizadas las responsabilidades del sistema.
+Esta organización permite mantener separadas las responsabilidades entre:
 
-De esta manera, SpeedFast conserva la estructura desarrollada durante las semanas anteriores e incorpora una interfaz gráfica sin reemplazar la lógica existente.
+```text
+Interfaz
+Modelo
+Acceso a datos
+Conexión
+Base de datos
+```
+
+De esta manera, SpeedFast incorpora persistencia manteniendo la estructura orientada a objetos desarrollada durante las semanas anteriores.
 
 ---
 
 # ✅ Conclusión
 
-El proyecto **SpeedFast** integra los conceptos trabajados durante las primeras seis semanas de Programación Orientado a Objetos II.
+El proyecto **SpeedFast** integra los conceptos desarrollados durante las primeras siete semanas de Programación Orientado a Objetos II.
 
-La clase abstracta `Pedido` permite centralizar información y comportamientos comunes, mientras que `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` especializan sus reglas mediante herencia, sobrecarga, sobrescritura y polimorfismo.
+La clase abstracta `Pedido` permite centralizar información y comportamientos comunes, mientras que `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` especializan las reglas del sistema.
 
-Las interfaces `Despachable`, `Cancelable` y `Rastreable` permiten representar diferentes capacidades de los pedidos y mantener organizada la estructura del sistema.
+Las interfaces permiten representar diferentes capacidades de los pedidos.
 
-Durante la Semana 4 se incorpora concurrencia mediante la clase `Repartidor`, que implementa `Runnable`, junto con `ExecutorService` para administrar las tareas.
+Durante la Semana 4 se incorpora concurrencia mediante `Runnable` y `ExecutorService`.
 
-Durante la Semana 5 se incorpora `ZonaDeCarga` como recurso compartido, junto con métodos `synchronized` para controlar el acceso de los repartidores a los pedidos.
+Durante la Semana 5 se incorpora sincronización mediante `ZonaDeCarga`.
 
-También se incorpora `EstadoPedido`, permitiendo representar el cambio de cada pedido desde `PENDIENTE` a `EN_REPARTO` y finalmente a `ENTREGADO`.
+Durante la Semana 6 se incorpora una interfaz gráfica desarrollada con Java Swing.
 
-Durante la Semana 6 se incorpora una interfaz gráfica mediante Java Swing, permitiendo registrar pedidos, consultar los registros almacenados, iniciar el proceso de entrega y salir de la aplicación mediante una interfaz visual.
+Durante la Semana 7 se incorpora persistencia mediante **JDBC y MySQL**.
 
-La incorporación de `ControladorPedidos` permite compartir los pedidos entre las distintas ventanas, mientras que la organización mediante paquetes separa la ejecución, el modelo y la interfaz gráfica.
+Las clases DAO permiten separar las operaciones SQL del resto de la aplicación y `ConexionBD` centraliza la conexión con MySQL.
 
-De esta forma, SpeedFast evoluciona desde una aplicación ejecutada principalmente por consola hacia una aplicación con interfaz gráfica, manteniendo los conceptos de Programación Orientada a Objetos, concurrencia y sincronización desarrollados durante las semanas anteriores.
+La interfaz permite registrar y consultar información persistente, mientras que las entregas y cambios de estado quedan registrados en la base de datos.
+
+De esta forma, SpeedFast evoluciona desde una aplicación orientada a objetos con interfaz gráfica hacia una aplicación conectada a una base de datos relacional, manteniendo los conceptos desarrollados durante las semanas anteriores.
 
 ---
 
