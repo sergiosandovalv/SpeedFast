@@ -68,7 +68,7 @@ De esta forma, los datos registrados pueden mantenerse almacenados aunque la apl
 - Sobrescritura mediante `@Override`.
 - Interfaces.
 - Implementación de múltiples interfaces.
-- Desacoplamiento.![Duoc UC](https://www.duoc.cl/wp-content/uploads/2022/09/logo-0.png)
+- Desacoplamiento.
 
 # 🧠 Evaluación – Programación Orientado a Objetos II
 
@@ -1314,7 +1314,6 @@ SpeedFast/
 ---
 
 # 📦 Organización mediante paquetes
-![Duoc UC](https://www.duoc.cl/wp-content/uploads/2022/09/logo-0.png)
 
 # 🧠 Evaluación – Programación Orientado a Objetos II
 
