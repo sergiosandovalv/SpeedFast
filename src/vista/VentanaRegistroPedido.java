@@ -1,3 +1,4 @@
+
 package vista;
 
 import dao.PedidoDAO;
@@ -10,50 +11,63 @@ import modelo.PedidoExpress;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Ventana para registrar pedidos en SpeedFast.
+ * Valida los datos y almacena los pedidos en MySQL.
+ *
+ * @author Sergio Sandoval
+ */
 public class VentanaRegistroPedido extends JFrame {
 
     private final ControladorPedidos controlador;
     private final PedidoDAO pedidoDAO;
 
-    private JTextField txtId;
-    private JTextField txtDireccion;
-    private JTextField txtDistancia;
-    private JComboBox<String> cmbTipo;
-    private JButton btnVolver;
-    private JButton btnGuardar;
+    private final JTextField txtDireccion;
+    private final JTextField txtDistancia;
+    private final JComboBox<String> cmbTipo;
+    private final JButton btnVolver;
+    private final JButton btnGuardar;
 
     public VentanaRegistroPedido(ControladorPedidos controlador) {
+
         this.controlador = controlador;
         this.pedidoDAO = new PedidoDAO();
 
         setTitle("SpeedFast - Registrar Pedido");
-        setSize(450, 300);
+        setSize(450, 260);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel panelFormulario =
+                new JPanel(new GridLayout(4, 2, 10, 10));
+
         panelFormulario.setBorder(
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         );
 
-        txtId = new JTextField();
         txtDireccion = new JTextField();
         txtDistancia = new JTextField();
 
-        String[] tiposPedido = {"Comida", "Encomienda", "Express"};
+        String[] tiposPedido = {
+                "Comida",
+                "Encomienda",
+                "Express"
+        };
+
         cmbTipo = new JComboBox<>(tiposPedido);
 
         btnVolver = new JButton("Volver");
         btnGuardar = new JButton("Guardar");
 
-        panelFormulario.add(new JLabel("ID:"));
-        panelFormulario.add(txtId);
         panelFormulario.add(new JLabel("Direccion:"));
         panelFormulario.add(txtDireccion);
+
         panelFormulario.add(new JLabel("Distancia (km):"));
         panelFormulario.add(txtDistancia);
+
         panelFormulario.add(new JLabel("Tipo:"));
         panelFormulario.add(cmbTipo);
+
         panelFormulario.add(btnVolver);
         panelFormulario.add(btnGuardar);
 
@@ -63,14 +77,15 @@ public class VentanaRegistroPedido extends JFrame {
         btnGuardar.addActionListener(e -> guardarPedido());
     }
 
+    /**
+     * Valida los datos y registra el pedido en MySQL.
+     */
     private void guardarPedido() {
 
-        String idTexto = txtId.getText().trim();
         String direccion = txtDireccion.getText().trim();
         String distanciaTexto = txtDistancia.getText().trim();
 
-        if (idTexto.isEmpty() || direccion.isEmpty()
-                || distanciaTexto.isEmpty()) {
+        if (direccion.isEmpty() || distanciaTexto.isEmpty()) {
 
             JOptionPane.showMessageDialog(
                     this,
@@ -78,45 +93,37 @@ public class VentanaRegistroPedido extends JFrame {
                     "Datos incompletos",
                     JOptionPane.WARNING_MESSAGE
             );
-            return;
-        }
 
-        int id;
-
-        try {
-            id = Integer.parseInt(idTexto);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El ID debe ser un numero entero.",
-                    "ID invalido",
-                    JOptionPane.ERROR_MESSAGE
-            );
             return;
         }
 
         double distancia;
 
         try {
+
             distancia = Double.parseDouble(distanciaTexto);
 
-            if (distancia <= 0) {
+            if (!Double.isFinite(distancia) || distancia <= 0) {
+
                 JOptionPane.showMessageDialog(
                         this,
-                        "La distancia debe ser mayor que cero.",
+                        "La distancia debe ser un numero mayor que cero.",
                         "Distancia invalida",
-                        JOptionPane.ERROR_MESSAGE
+                        JOptionPane.WARNING_MESSAGE
                 );
+
                 return;
             }
 
         } catch (NumberFormatException e) {
+
             JOptionPane.showMessageDialog(
                     this,
-                    "La distancia debe ser un numero valido.",
+                    "Ingrese solo el valor numerico, por ejemplo: 4.5",
                     "Distancia invalida",
-                    JOptionPane.ERROR_MESSAGE
+                    JOptionPane.WARNING_MESSAGE
             );
+
             return;
         }
 
@@ -124,25 +131,40 @@ public class VentanaRegistroPedido extends JFrame {
         Pedido pedido;
 
         switch (tipo) {
+
             case "Comida":
-                pedido = new PedidoComida(id, direccion, distancia);
+                pedido = new PedidoComida(
+                        0,
+                        direccion,
+                        distancia
+                );
                 break;
 
             case "Encomienda":
-                pedido = new PedidoEncomienda(id, direccion, distancia);
+                pedido = new PedidoEncomienda(
+                        0,
+                        direccion,
+                        distancia
+                );
                 break;
 
             case "Express":
-                pedido = new PedidoExpress(id, direccion, distancia);
+                pedido = new PedidoExpress(
+                        0,
+                        direccion,
+                        distancia
+                );
                 break;
 
             default:
+
                 JOptionPane.showMessageDialog(
                         this,
                         "Debe seleccionar un tipo de pedido.",
                         "Tipo invalido",
-                        JOptionPane.ERROR_MESSAGE
+                        JOptionPane.WARNING_MESSAGE
                 );
+
                 return;
         }
 
@@ -152,7 +174,9 @@ public class VentanaRegistroPedido extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Pedido registrado correctamente.",
+                    "Pedido registrado correctamente.\n"
+                            + "ID asignado por MySQL: "
+                            + pedido.getIdPedido(),
                     "Registro exitoso",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -170,11 +194,14 @@ public class VentanaRegistroPedido extends JFrame {
         }
     }
 
+    /**
+     * Limpia los campos del formulario.
+     */
     private void limpiarFormulario() {
-        txtId.setText("");
+
         txtDireccion.setText("");
         txtDistancia.setText("");
         cmbTipo.setSelectedIndex(0);
-        txtId.requestFocus();
+        txtDireccion.requestFocus();
     }
 }

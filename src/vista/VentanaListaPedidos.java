@@ -18,6 +18,7 @@ public class VentanaListaPedidos extends JFrame {
     private JTable tablaPedidos;
     private DefaultTableModel modeloTabla;
     private JButton btnRefrescar;
+    private JButton btnEditar;
     private JButton btnVolver;
     private final PedidoTablaDAO pedidoTablaDAO;
 
@@ -51,6 +52,7 @@ public class VentanaListaPedidos extends JFrame {
                 new JScrollPane(tablaPedidos);
 
         btnRefrescar = new JButton("Refrescar");
+        btnEditar = new JButton("Editar pedido");
         btnVolver = new JButton("Volver");
 
         JPanel panelBoton = new JPanel();
@@ -60,6 +62,7 @@ public class VentanaListaPedidos extends JFrame {
         );
 
         panelBoton.add(btnRefrescar);
+        panelBoton.add(btnEditar);
         panelBoton.add(btnVolver);
 
         setLayout(new BorderLayout());
@@ -69,6 +72,10 @@ public class VentanaListaPedidos extends JFrame {
 
         btnRefrescar.addActionListener(
                 e -> cargarPedidos()
+        );
+
+        btnEditar.addActionListener(
+                e -> editarPedido()
         );
 
         btnVolver.addActionListener(
@@ -83,5 +90,43 @@ public class VentanaListaPedidos extends JFrame {
      */
     private void cargarPedidos() {
         pedidoTablaDAO.cargarPedidos(modeloTabla);
+    }
+
+    /**
+     * Obtiene el pedido seleccionado para editarlo.
+     */
+    private void editarPedido() {
+
+        int fila = tablaPedidos.getSelectedRow();
+
+        if (fila < 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe seleccionar un pedido.",
+                    "Pedido no seleccionado",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        int id = (int) modeloTabla.getValueAt(fila, 0);
+        String direccion =
+                modeloTabla.getValueAt(fila, 1).toString();
+        String tipo =
+                modeloTabla.getValueAt(fila, 2).toString();
+        String estado =
+                modeloTabla.getValueAt(fila, 3).toString();
+
+        VentanaEditarPedido ventana =
+                new VentanaEditarPedido(
+                        id,
+                        direccion,
+                        tipo,
+                        estado
+                );
+
+        ventana.setVisible(true);
     }
 }

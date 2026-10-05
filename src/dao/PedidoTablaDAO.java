@@ -1,3 +1,4 @@
+
 package dao;
 
 import datos.ConexionBD;
@@ -16,14 +17,23 @@ import java.sql.SQLException;
  */
 public class PedidoTablaDAO {
 
+    /**
+     * Consulta los pedidos registrados en MySQL
+     * y actualiza el contenido de la tabla.
+     *
+     * @param modeloTabla modelo de la tabla de pedidos
+     */
     public void cargarPedidos(DefaultTableModel modeloTabla) {
 
-        String sql = "SELECT id, direccion, tipo, estado FROM pedido";
+        String sql =
+                "SELECT id, direccion, tipo, estado " +
+                        "FROM pedidos ORDER BY id";
 
         modeloTabla.setRowCount(0);
 
         try (Connection conexion = ConexionBD.obtenerConexion();
-             PreparedStatement sentencia = conexion.prepareStatement(sql);
+             PreparedStatement sentencia =
+                     conexion.prepareStatement(sql);
              ResultSet resultado = sentencia.executeQuery()) {
 
             while (resultado.next()) {
@@ -39,6 +49,7 @@ public class PedidoTablaDAO {
             }
 
         } catch (SQLException e) {
+
             System.out.println("Error al consultar los pedidos.");
             System.out.println(e.getMessage());
         }

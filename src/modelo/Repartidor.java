@@ -1,3 +1,4 @@
+
 package modelo;
 
 import dao.EntregaDAO;
@@ -6,6 +7,11 @@ import dao.PedidoDAO;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Representa un repartidor encargado de procesar pedidos.
+ *
+ * @author Sergio Sandoval
+ */
 public class Repartidor implements Runnable {
 
     private int id;
@@ -46,6 +52,9 @@ public class Repartidor implements Runnable {
         this.zonaDeCarga = zonaDeCarga;
     }
 
+    /**
+     * Procesa los pedidos disponibles en la zona de carga.
+     */
     @Override
     public void run() {
 
@@ -64,12 +73,21 @@ public class Repartidor implements Runnable {
                 break;
             }
 
-            pedido.setEstado(EstadoPedido.EN_REPARTO.name());
-
-            pedidoDAO.actualizarEstado(
+            boolean estadoActualizado = pedidoDAO.actualizarEstado(
                     pedido.getIdPedido(),
                     EstadoPedido.EN_REPARTO.name()
             );
+
+            if (!estadoActualizado) {
+                System.out.println(
+                        "[Repartidor - " + nombre
+                                + "] No se pudo iniciar el pedido #"
+                                + pedido.getIdPedido()
+                );
+                continue;
+            }
+
+            pedido.setEstado(EstadoPedido.EN_REPARTO.name());
 
             System.out.println(
                     "[Repartidor - " + nombre
@@ -103,13 +121,6 @@ public class Repartidor implements Runnable {
                 return;
             }
 
-            pedido.setEstado(EstadoPedido.ENTREGADO.name());
-
-            pedidoDAO.actualizarEstado(
-                    pedido.getIdPedido(),
-                    EstadoPedido.ENTREGADO.name()
-            );
-
             Entrega entrega = new Entrega(
                     pedido.getIdPedido(),
                     id,
@@ -117,7 +128,35 @@ public class Repartidor implements Runnable {
                     LocalTime.now()
             );
 
-            entregaDAO.guardar(entrega);
+            if (!entregaDAO.guardar(entrega)) {
+
+                System.out.println(
+                        "[Repartidor - " + nombre
+                                + "] Error al registrar la entrega del pedido #"
+                                + pedido.getIdPedido()
+                );
+
+                continue;
+            }
+
+            boolean entregaActualizada = pedidoDAO.actualizarEstado(
+                    pedido.getIdPedido(),
+                    EstadoPedido.ENTREGADO.name()
+            );
+
+            if (!entregaActualizada) {
+
+                System.out.println(
+                        "[Repartidor - " + nombre
+                                + "] Entrega registrada, pero no se pudo "
+                                + "actualizar el estado del pedido #"
+                                + pedido.getIdPedido()
+                );
+
+                continue;
+            }
+
+            pedido.setEstado(EstadoPedido.ENTREGADO.name());
 
             System.out.println(
                     "[Repartidor - " + nombre

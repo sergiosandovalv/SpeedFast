@@ -12,13 +12,23 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Ventana principal del sistema SpeedFast.
+ * Permite gestionar pedidos, repartidores y entregas.
+ *
+ * @author Sergio Sandoval
+ */
 public class VentanaPrincipal extends JFrame {
 
     private final ControladorPedidos controlador;
 
     private JButton btnRegistrarPedido;
     private JButton btnRegistrarRepartidor;
+    private JButton btnEditarRepartidor;
+    private JButton btnEliminarRepartidor;
     private JButton btnListarPedidos;
+    private JButton btnEliminarPedido;
+    private JButton btnGestionarEntregas;
     private JButton btnIniciarEntrega;
     private JButton btnSalir;
 
@@ -27,50 +37,106 @@ public class VentanaPrincipal extends JFrame {
         this.controlador = controlador;
 
         setTitle("SpeedFast - Gestion de Pedidos");
-        setSize(800, 550);
+        setSize(800, 850);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panelPrincipal = new JPanel();
-        panelPrincipal.setLayout(new GridLayout(5, 1, 10, 10));
+        panelPrincipal.setLayout(new GridLayout(9, 1, 10, 10));
 
         btnRegistrarPedido = new JButton("Registrar pedido");
         btnRegistrarRepartidor = new JButton("Registrar repartidor");
+        btnEditarRepartidor = new JButton("Editar repartidor");
+        btnEliminarRepartidor = new JButton("Eliminar repartidor");
         btnListarPedidos = new JButton("Listar pedidos");
+        btnEliminarPedido = new JButton("Eliminar pedido");
+        btnGestionarEntregas = new JButton("Gestionar entregas");
+
         btnIniciarEntrega =
                 new JButton("Asignar repartidor / Iniciar entrega");
+
         btnSalir = new JButton("Salir de la aplicacion");
 
         panelPrincipal.add(btnRegistrarPedido);
         panelPrincipal.add(btnRegistrarRepartidor);
+        panelPrincipal.add(btnEditarRepartidor);
+        panelPrincipal.add(btnEliminarRepartidor);
         panelPrincipal.add(btnListarPedidos);
+        panelPrincipal.add(btnEliminarPedido);
+        panelPrincipal.add(btnGestionarEntregas);
         panelPrincipal.add(btnIniciarEntrega);
         panelPrincipal.add(btnSalir);
 
         add(panelPrincipal);
 
         btnRegistrarPedido.addActionListener(e -> {
+
             VentanaRegistroPedido ventanaRegistro =
                     new VentanaRegistroPedido(controlador);
+
             ventanaRegistro.setVisible(true);
         });
 
         btnRegistrarRepartidor.addActionListener(e -> {
+
             VentanaRegistroRepartidor ventanaRepartidor =
                     new VentanaRegistroRepartidor();
+
             ventanaRepartidor.setVisible(true);
         });
 
+        btnEditarRepartidor.addActionListener(e -> {
+
+            VentanaEditarRepartidor ventanaEditar =
+                    new VentanaEditarRepartidor();
+
+            ventanaEditar.setVisible(true);
+        });
+
+        btnEliminarRepartidor.addActionListener(e -> {
+
+            VentanaEliminarRepartidor ventanaEliminar =
+                    new VentanaEliminarRepartidor();
+
+            ventanaEliminar.setVisible(true);
+        });
+
         btnListarPedidos.addActionListener(e -> {
+
             VentanaListaPedidos ventanaLista =
                     new VentanaListaPedidos(controlador);
+
             ventanaLista.setVisible(true);
         });
 
-        btnIniciarEntrega.addActionListener(e -> iniciarEntregas());
-        btnSalir.addActionListener(e -> salirAplicacion());
+        btnEliminarPedido.addActionListener(e -> {
+
+            VentanaEliminarPedido ventanaEliminarPedido =
+                    new VentanaEliminarPedido();
+
+            ventanaEliminarPedido.setVisible(true);
+        });
+
+        btnGestionarEntregas.addActionListener(e -> {
+
+            VentanaGestionEntregas ventanaEntregas =
+                    new VentanaGestionEntregas();
+
+            ventanaEntregas.setVisible(true);
+        });
+
+        btnIniciarEntrega.addActionListener(
+                e -> iniciarEntregas()
+        );
+
+        btnSalir.addActionListener(
+                e -> salirAplicacion()
+        );
     }
 
+    /**
+     * Inicia la asignacion y entrega de los pedidos pendientes.
+     */
     private void iniciarEntregas() {
 
         List<Pedido> pedidosPendientes =
@@ -132,6 +198,9 @@ public class VentanaPrincipal extends JFrame {
         );
     }
 
+    /**
+     * Solicita confirmacion antes de cerrar la aplicacion.
+     */
     private void salirAplicacion() {
 
         int opcion = JOptionPane.showConfirmDialog(

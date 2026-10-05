@@ -1,3 +1,4 @@
+
 package datos;
 
 import java.sql.Connection;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 public class ConexionBD {
 
     private static final String URL =
-            "jdbc:mysql://localhost:3306/speedfast_db";
+            "jdbc:mysql://localhost:3306/speedfast_semana8_db";
 
     private static final String USUARIO = "root";
 
